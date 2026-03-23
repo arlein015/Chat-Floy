@@ -2,209 +2,46 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Messages | Floy</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        :root {
-            --f-black: #000000;
-            --f-dark: #121212;
-            --f-accent: #FF7A1A; /* Ton orange Floy */
-            --f-grey: #262626;
-            --f-text: #ffffff;
-            --f-dim: #a8a8a8;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            background: var(--f-black); color: var(--f-text); 
-            font-family: -apple-system, system-ui, sans-serif; 
-            margin: 0; padding: 0; overflow-x: hidden;
-        }
-
-        /* --- HEADER --- */
-        .header {
-            position: sticky; top: 0; z-index: 1000;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(15px);
-            padding: 15px 20px; display: flex; align-items: center;
-            justify-content: space-between; border-bottom: 1px solid var(--f-grey);
-        }
-        .header h1 { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -1px; }
-
-        /* --- RECHERCHE --- */
-        .search-container { padding: 10px 20px; }
-        .search-box {
-            background: var(--f-dark); border-radius: 12px;
-            padding: 10px 15px; display: flex; align-items: center; gap: 10px;
-        }
-        .search-box input {
-            background: transparent; border: none; color: white; flex: 1; font-size: 15px;
-        }
-
-        /* --- STORIES (Optionnel mais très Messenger) --- */
-        .stories-row {
-            display: flex; gap: 15px; padding: 10px 20px;
-            overflow-x: auto; scrollbar-width: none;
-        }
-        .story-item { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; }
-        .story-ring {
-            width: 65px; height: 65px; border-radius: 50%;
-            padding: 3px; border: 2px solid var(--f-accent);
-        }
-        .story-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #333; }
-        .story-name { font-size: 11px; color: var(--f-dim); max-width: 65px; overflow: hidden; text-overflow: ellipsis; }
-
-        /* --- LISTE DES DISCUSSIONS --- */
-        .chat-list { display: flex; flex-direction: column; margin-top: 10px; padding-bottom: 100px; }
-
-        .chat-item {
-            display: flex; align-items: center; gap: 15px;
-            padding: 12px 20px; cursor: pointer; transition: 0.2s;
-        }
-        .chat-item:active { background: var(--f-dark); }
-
-        .avatar-wrap { position: relative; flex-shrink: 0; }
-        .u-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #222; }
-        
-        .status-dot {
-            position: absolute; bottom: 3px; right: 3px;
-            width: 14px; height: 14px; background: #31a24c;
-            border-radius: 50%; border: 3px solid var(--f-black);
-            display: none; /* Affiché via JS */
-        }
-
-        .chat-info { flex: 1; min-width: 0; border-bottom: 0.5px solid var(--f-grey); padding-bottom: 12px; }
-        .chat-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-        .u-name { font-weight: 600; font-size: 16px; color: #fff; }
-        .m-time { font-size: 12px; color: var(--f-dim); }
-
-        .chat-preview {
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 14px; color: var(--f-dim);
-        }
-        .last-msg { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
-
-        .unread-badge {
-            width: 10px; height: 10px; background: var(--f-accent);
-            border-radius: 50%; display: none;
-        }
-        .unread .unread-badge { display: block; }
-        .unread .last-msg { color: #fff; font-weight: 700; }
-
-        /* --- NAVBAR BASSE --- */
-        .nav-bar {
-            position: fixed; bottom: 0; width: 100%;
-            background: rgba(0,0,0,0.9); border-top: 1px solid var(--f-grey);
-            display: flex; justify-content: space-around; padding: 15px 0;
-            backdrop-filter: blur(10px); z-index: 1000;
-        }
-        .nav-icon { font-size: 22px; color: var(--f-dim); cursor: pointer; }
-        .nav-icon.active { color: var(--f-accent); }
-
-        /* LOADER INITIAL */
-        #floy-loader {
-            position: fixed; inset: 0; background: #000; z-index: 2000;
-            display: flex; align-items: center; justify-content: center;
-        }
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; }
+        header { padding: 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        .chat-item { padding: 15px 20px; border-bottom: 1px solid #111; display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #333; }
+        #loader { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 100; }
     </style>
 </head>
 <body>
-
-    <div id="floy-loader">
-        <i class="fas fa-circle-notch fa-spin" style="color:var(--f-accent); font-size:30px;"></i>
-    </div>
-
-    <header class="header">
-        <h1>Chats</h1>
-        <div style="display: flex; gap: 20px; font-size: 18px; color: var(--f-accent);">
-            <i class="fas fa-camera"></i>
-            <i class="fas fa-pencil-alt"></i>
-        </div>
-    </header>
-
-    <div class="search-container">
-        <div class="search-box">
-            <i class="fas fa-search" style="color:var(--f-dim)"></i>
-            <input type="text" placeholder="Rechercher...">
-        </div>
-    </div>
-
-    <div class="stories-row">
-        <div class="story-item">
-            <div class="story-ring" style="border-color: #555;">
-                <img src="https://via.placeholder.com/100" class="story-img">
-            </div>
-            <span class="story-name">Ton profil</span>
-        </div>
-        </div>
-
-    <main class="chat-list" id="inbox-render">
-        </main>
-
-    <footer class="nav-bar">
-        <div class="nav-icon"><i class="fas fa-home"></i></div>
-        <div class="nav-icon active"><i class="fas fa-comment"></i></div>
-        <div class="nav-icon"><i class="fas fa-compass"></i></div>
-        <div class="nav-icon" onclick="location.href='profil.html'"><i class="fas fa-user-circle"></i></div>
-    </footer>
+    <div id="loader"><b style="color:#FF7A1A;">CHARGEMENT FLOY...</b></div>
+    <header><h2>Chats</h2></header>
+    <div id="inbox"></div>
 
     <script type="module">
         import { db, auth } from './firebase-config.js';
-        import { collection, query, onSnapshot, orderBy, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const inbox = document.getElementById('inbox-render');
+        import { collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         auth.onAuthStateChanged(user => {
-            if(!user) {
-                window.location.href = "auth.html"; // Rediriger vers ton fichier login renommé
-            } else {
-                document.getElementById('floy-loader').style.display = 'none';
-                initInbox(user.uid);
+            if(!user) window.location.href = "auth.html";
+            else {
+                document.getElementById('loader').style.display = 'none';
+                // Note : Si ça ne s'affiche pas, clique sur le lien d'INDEX dans ta console !
+                const q = query(collection(db, "users"), orderBy("username", "asc"));
+                onSnapshot(q, (snap) => {
+                    const ui = document.getElementById('inbox');
+                    ui.innerHTML = "";
+                    snap.forEach(doc => {
+                        const u = doc.data();
+                        if(doc.id === user.uid) return;
+                        ui.innerHTML += `
+                            <div class="chat-item" onclick="window.location.href='chat.html?id=${doc.id}'">
+                                <img src="${u.avatarUrl || 'https://via.placeholder.com/50'}" class="avatar">
+                                <div><b>${u.username}</b><br><small style="color:gray">Cliquer pour discuter</small></div>
+                            </div>`;
+                    });
+                });
             }
         });
-
-        function initInbox(myUid) {
-            // On récupère tous les utilisateurs pour simuler les conversations
-            const q = query(collection(db, "users"), orderBy("username", "asc"));
-            
-            onSnapshot(q, (snap) => {
-                inbox.innerHTML = "";
-                snap.forEach(docSnap => {
-                    const u = docSnap.data();
-                    if(docSnap.id === myUid) return;
-
-                    const item = document.createElement('div');
-                    item.className = 'chat-item';
-                    
-                    // Simuler un message non-lu
-                    if(Math.random() > 0.8) item.classList.add('unread');
-
-                    item.onclick = () => {
-                        window.location.href = `chat.html?id=${docSnap.id}`;
-                    };
-
-                    item.innerHTML = `
-                        <div class="avatar-wrap">
-                            <img src="${u.avatarUrl || 'https://via.placeholder.com/150'}" class="u-avatar">
-                            <div class="status-dot" style="display: ${u.isOnline ? 'block' : 'none'}"></div>
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-top">
-                                <span class="u-name">${u.username}</span>
-                                <span class="m-time">10:45</span>
-                            </div>
-                            <div class="chat-preview">
-                                <span class="last-msg">Envoyé via Chat Floy...</span>
-                                <div class="unread-badge"></div>
-                            </div>
-                        </div>
-                    `;
-                    inbox.appendChild(item);
-                });
-            });
-        }
     </script>
 </body>
 </html>
