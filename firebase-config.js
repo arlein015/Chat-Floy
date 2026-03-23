@@ -13,10 +13,9 @@ const firebaseConfig = {
   measurementId: "G-QV8DVCRY1Q"
 };
 
-// Initialisation
 const app = initializeApp(firebaseConfig);
 
-// Exportation des modules (C'est ce qui manque dans ta capture !)
+// IL FAUT ABSOLUMENT CES LIGNES AVEC "export"
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
