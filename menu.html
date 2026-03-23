@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Menu | Floy</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --f-bg: #000000;
@@ -12,8 +11,7 @@
             --f-card: #121212;
             --f-text: #ffffff;
             --f-dim: #8e8e8e;
-            --f-border: #262626;
-            --f-danger: #ff3b30;
+            --f-border: #1c1c1e;
         }
 
         body { 
@@ -22,91 +20,98 @@
         }
 
         header {
-            padding: 20px; display: flex; align-items: center; gap: 15px;
+            padding: 15px 20px; display: flex; align-items: center; gap: 20px;
             border-bottom: 1px solid var(--f-border);
         }
-        .back-btn { font-size: 22px; color: var(--f-accent); cursor: pointer; }
 
-        /* --- PROFIL SECTION --- */
-        .profile-hero {
-            padding: 30px 20px; text-align: center;
-            background: linear-gradient(to bottom, #111, #000);
-        }
+        .back-btn-svg { cursor: pointer; display: flex; align-items: center; }
+
+        /* --- PROFIL --- */
+        .profile-hero { padding: 35px 20px; text-align: center; }
         .menu-avatar {
-            width: 100px; height: 100px; border-radius: 50%;
-            border: 3px solid var(--f-accent); margin-bottom: 15px;
+            width: 95px; height: 95px; border-radius: 50%;
+            border: 3px solid var(--f-accent); margin-bottom: 12px;
             object-fit: cover;
         }
         .user-name { font-size: 22px; font-weight: 800; display: block; }
-        .user-status { color: var(--f-dim); font-size: 14px; margin-top: 5px; }
-
-        /* --- LISTE DES OPTIONS --- */
-        .menu-list { padding: 10px; }
+        
+        /* --- LISTE --- */
+        .menu-list { padding: 10px 15px; }
         .menu-item {
-            display: flex; align-items: center; gap: 15px;
-            padding: 18px; border-radius: 12px;
-            margin-bottom: 5px; cursor: pointer;
-            transition: 0.2s;
+            display: flex; align-items: center; gap: 18px;
+            padding: 16px; border-radius: 14px;
+            margin-bottom: 8px; cursor: pointer;
+            transition: background 0.2s;
         }
-        .menu-item:active { background: #1a1a1a; }
-        .menu-item i { font-size: 20px; width: 30px; color: var(--f-accent); }
+        .menu-item:active { background: #111; }
         .menu-item span { font-size: 16px; font-weight: 500; flex: 1; }
-        .menu-item .chevron { color: #333; font-size: 14px; }
-
-        .logout { color: var(--f-danger); margin-top: 20px; }
-        .logout i { color: var(--f-danger); }
-
-        .footer-logo {
-            text-align: center; margin-top: 40px; padding-bottom: 30px;
-            opacity: 0.3; font-weight: 900; letter-spacing: 5px;
+        
+        .icon-box {
+            width: 32px; height: 32px; display: flex; 
+            align-items: center; justify-content: center;
         }
+
+        .logout { color: #ff3b30; margin-top: 15px; }
     </style>
 </head>
 <body>
 
     <header>
-        <i class="fas fa-times back-btn" onclick="window.history.back()"></i>
-        <span style="font-weight: bold; font-size: 18px;">Menu</span>
+        <div class="back-btn-svg" onclick="window.history.back()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="#FF7A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <span style="font-weight: 800; font-size: 19px; letter-spacing: 1px;">RÉGLAGES</span>
     </header>
 
     <div class="profile-hero">
         <img id="user-img" src="https://via.placeholder.com/100" class="menu-avatar">
         <span class="user-name" id="user-name">Chargement...</span>
-        <span class="user-status">Membre Officiel Floy</span>
     </div>
 
     <div class="menu-list">
         <div class="menu-item" onclick="window.location.href='profile-edit.html'">
-            <i class="fas fa-user-circle"></i>
+            <div class="icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF7A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </div>
             <span>Mon Profil</span>
-            <i class="fas fa-chevron-right chevron"></i>
         </div>
 
         <div class="menu-item">
-            <i class="fas fa-bell"></i>
+            <div class="icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF7A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8C6 12 4 14 4 14H20C20 14 18 12 18 8Z"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+            </div>
             <span>Notifications</span>
-            <i class="fas fa-chevron-right chevron"></i>
         </div>
 
         <div class="menu-item">
-            <i class="fas fa-shield-alt"></i>
-            <span>Sécurité & Confidentialité</span>
-            <i class="fas fa-chevron-right chevron"></i>
-        </div>
-
-        <div class="menu-item">
-            <i class="fas fa-question-circle"></i>
-            <span>Aide & Support</span>
-            <i class="fas fa-chevron-right chevron"></i>
+            <div class="icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF7A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+            <span>Sécurité</span>
         </div>
 
         <div class="menu-item logout" id="btn-logout">
-            <i class="fas fa-sign-out-alt"></i>
+            <div class="icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff3b30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </div>
             <span>Déconnexion</span>
         </div>
     </div>
-
-    <div class="footer-logo">FLOY</div>
 
     <script type="module">
         import { db, auth } from './firebase-config.js';
@@ -117,7 +122,6 @@
             if (!user) {
                 window.location.href = "auth.html";
             } else {
-                // Charger les infos depuis la collection Utilisateurs (U majuscule)
                 const snap = await getDoc(doc(db, "Utilisateurs", user.uid));
                 if (snap.exists()) {
                     document.getElementById('user-name').innerText = snap.data().username;
@@ -126,12 +130,9 @@
             }
         });
 
-        // Logique de déconnexion
         document.getElementById('btn-logout').onclick = () => {
-            if(confirm("Voulez-vous vraiment vous déconnecter de Floy ?")) {
-                signOut(auth).then(() => {
-                    window.location.href = "auth.html";
-                });
+            if(confirm("Déconnexion de Floy ?")) {
+                signOut(auth).then(() => { window.location.href = "auth.html"; });
             }
         };
     </script>
