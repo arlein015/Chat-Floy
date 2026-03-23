@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Floy | Discussions</title>
+    <title>Floy | Messenger</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -12,125 +12,185 @@
             --f-card: #121212;
             --f-text: #ffffff;
             --f-dim: #8e8e8e;
-            --f-border: #262626;
+            --f-border: #1c1c1e;
         }
 
-        body { background: var(--f-bg); color: var(--f-text); font-family: sans-serif; margin: 0; padding: 0; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            background: var(--f-bg); color: var(--f-text); 
+            font-family: -apple-system, system-ui, sans-serif; 
+            margin: 0; padding: 0; overflow-x: hidden;
+        }
 
+        /* --- HEADER AVEC SVG --- */
         header {
             position: sticky; top: 0; z-index: 1000;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
-            padding: 10px 15px; display: flex; align-items: center;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
+            padding: 12px 18px; display: flex; align-items: center;
             justify-content: space-between; border-bottom: 1px solid var(--f-border);
         }
-        .user-trigger { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .my-avatar { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--f-accent); background: #222; }
-        .app-logo { font-size: 20px; font-weight: 900; color: var(--f-accent); letter-spacing: 3px; }
+        .my-avatar-wrapper {
+            width: 38px; height: 38px; border-radius: 50%;
+            border: 2px solid var(--f-accent); overflow: hidden; cursor: pointer;
+        }
+        .my-avatar-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .app-logo { font-size: 22px; font-weight: 900; color: var(--f-accent); letter-spacing: 4px; margin: 0; }
 
-        .search-area { padding: 15px; cursor: pointer; }
-        .search-bar {
-            background: var(--f-card); border-radius: 10px;
-            padding: 10px 15px; display: flex; align-items: center; gap: 10px;
-            color: var(--f-dim); border: 1px solid #222;
+        /* --- ZONE DE RECHERCHE --- */
+        .search-container { padding: 15px; }
+        .search-bar-fake {
+            background: var(--f-card); border-radius: 12px;
+            padding: 12px 15px; display: flex; align-items: center; gap: 12px;
+            color: var(--f-dim); cursor: pointer; border: 1px solid #222;
         }
 
+        /* --- LISTE DES DISCUSSIONS --- */
+        .inbox-title { padding: 0 20px 10px 20px; font-size: 13px; color: var(--f-dim); text-transform: uppercase; letter-spacing: 1px; }
         .inbox-list { display: flex; flex-direction: column; }
-        .chat-item {
+        
+        .chat-card {
             display: flex; align-items: center; gap: 15px;
-            padding: 12px 15px; cursor: pointer; border-bottom: 0.5px solid var(--f-border);
+            padding: 15px 20px; cursor: pointer; 
+            transition: background 0.2s; border-bottom: 0.5px solid var(--f-border);
         }
-        .u-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; background: #222; }
-        .u-name { font-weight: 600; font-size: 16px; display: block; }
-        .u-msg { font-size: 14px; color: var(--f-dim); }
+        .chat-card:active { background: #111; }
 
+        .u-avatar-container { position: relative; }
+        .u-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; background: #222; }
+        .online-dot { 
+            width: 14px; height: 14px; background: #34c759; border: 3px solid #000; 
+            border-radius: 50%; position: absolute; bottom: 2px; right: 2px; 
+            display: none; /* Affiché via JS si en ligne */
+        }
+
+        .chat-info { flex: 1; overflow: hidden; }
+        .u-name { font-weight: 700; font-size: 16px; margin-bottom: 4px; display: block; }
+        .u-preview { font-size: 14px; color: var(--f-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* --- LOADER --- */
         #floy-loader {
             position: fixed; inset: 0; background: #000; z-index: 2000;
             display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Animation de flottement pour le logo au chargement */
+        .pulse { animation: pulse-orange 1.5s infinite; }
+        @keyframes pulse-orange {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
         }
     </style>
 </head>
 <body>
 
     <div id="floy-loader">
-        <i class="fas fa-circle-notch fa-spin" style="color:var(--f-accent); font-size:30px;"></i>
-    </div>
-
-    <header style="display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; background: #000; border-bottom: 1px solid #1a1a1a;">
-    <div onclick="window.location.href='profile-edit.html'">
-        <img id="my-avatar" src="https://via.placeholder.com/40" style="width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #FF7A1A;">
-    </div>
-    
-    <h1 style="font-size: 20px; font-weight: 900; color: #FF7A1A; letter-spacing: 4px; margin: 0;">FLOY</h1>
-
-    <div onclick="window.location.href='menu.html'" style="cursor: pointer; display: flex; align-items: center;">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4 6H20M4 12H20M4 18H20" stroke="#FF7A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    </div>
-</header>
-
-    <div class="search-area" onclick="window.location.href='search.html'">
-        <div class="search-bar">
-            <i class="fas fa-search"></i>
-            <span>Rechercher un ami sur Floy...</span>
+        <div class="pulse">
+            <h1 class="app-logo">FLOY</h1>
         </div>
     </div>
 
-    <main class="inbox-list" id="inbox-render"></main>
+    <header>
+        <div class="my-avatar-wrapper" onclick="window.location.href='profile-edit.html'">
+            <img id="my-avatar-img" src="https://via.placeholder.com/40">
+        </div>
+        
+        <h1 class="app-logo">FLOY</h1>
+
+        <div onclick="window.location.href='menu.html'" style="cursor:pointer; display: flex; align-items: center;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 6H20M4 12H20M4 18H20" stroke="#FF7A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+    </header>
+
+    <div class="search-container" onclick="window.location.href='search.html'">
+        <div class="search-bar-fake">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span>Rechercher un ami...</span>
+        </div>
+    </div>
+
+    <div class="inbox-title">Messages</div>
+    <main class="inbox-list" id="inbox-render">
+        </main>
 
     <script type="module">
         import { db, auth } from './firebase-config.js';
         import { collection, query, onSnapshot, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        // Import des nouveaux modules experts
+        import { PresenceManager } from './presence-manager.js';
+        import { NotificationService } from './notification-service.js';
 
         const inbox = document.getElementById('inbox-render');
-
-        // FORCE L'ARRET DU LOADER IMMEDIATEMENT
-        document.getElementById('floy-loader').style.display = 'none';
+        const loader = document.getElementById('floy-loader');
 
         auth.onAuthStateChanged(async (user) => {
             if(!user) {
                 window.location.href = "auth.html";
             } else {
-                // Charger mon avatar
+                // 1. Démarrer les services en arrière-plan
+                PresenceManager.init();
+                PresenceManager.setStatus(true);
+                NotificationService.init();
+
+                // 2. Charger les infos de mon profil (Collection Utilisateurs)
                 try {
                     const mySnap = await getDoc(doc(db, "Utilisateurs", user.uid));
                     if(mySnap.exists()) {
-                        document.getElementById('my-avatar').src = mySnap.data().avatarUrl || 'https://via.placeholder.com/40';
+                        document.getElementById('my-avatar-img').src = mySnap.data().avatarUrl || 'https://via.placeholder.com/40';
                     }
                 } catch(e) { console.error("Erreur Profil:", e); }
                 
-                loadUsers(user.uid);
+                // 3. Charger la liste et cacher le loader
+                loadInbox(user.uid);
+                setTimeout(() => { loader.style.display = 'none'; }, 800);
             }
         });
 
-        function loadUsers(myUid) {
-            // Utilisation de "Utilisateurs" comme dans ta console Firebase
+        function loadInbox(myUid) {
+            // On écoute la collection "Utilisateurs" (U majuscule comme dans ta console)
             const q = query(collection(db, "Utilisateurs"), orderBy("username", "asc"));
             
             onSnapshot(q, (snap) => {
                 inbox.innerHTML = "";
+                if(snap.empty) {
+                    inbox.innerHTML = "<p style='text-align:center; color:#444; margin-top:50px;'>Aucun utilisateur trouvé</p>";
+                }
+
                 snap.forEach(docSnap => {
                     const u = docSnap.data();
-                    if(docSnap.id === myUid) return;
+                    if(docSnap.id === myUid) return; // Ne pas s'afficher soi-même
 
-                    const div = document.createElement('div');
-                    div.className = 'chat-item';
-                    div.onclick = () => window.location.href = `chat.html?id=${docSnap.id}`;
+                    const card = document.createElement('div');
+                    card.className = 'chat-card';
+                    card.onclick = () => window.location.href = `chat.html?id=${docSnap.id}`;
 
-                    div.innerHTML = `
-                        <img src="${u.avatarUrl || 'https://via.placeholder.com/150'}" class="u-img">
-                        <div style="flex:1">
-                            <span class="u-name">${u.username}</span>
-                            <div class="u-msg">Démarrer une discussion</div>
+                    // Affichage du point vert si en ligne
+                    const onlineStatus = u.isOnline ? 'display:block' : 'display:none';
+
+                    card.innerHTML = `
+                        <div class="u-avatar-container">
+                            <img src="${u.avatarUrl || 'https://via.placeholder.com/150'}" class="u-img">
+                            <div class="online-dot" style="${onlineStatus}"></div>
                         </div>
-                        <i class="fas fa-chevron-right" style="color:#222"></i>
+                        <div class="chat-info">
+                            <span class="u-name">${u.username}</span>
+                            <div class="u-preview">Cliquer pour discuter sur Floy</div>
+                        </div>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
                     `;
-                    inbox.appendChild(div);
+                    inbox.appendChild(card);
                 });
-            }, (error) => {
-                console.error("Erreur Firebase:", error);
-                // Si l'erreur permission-denied s'affiche ici, 
-                // c'est qu'il faut vraiment publier les règles sur Firebase.
+            }, (err) => {
+                console.error("Erreur de chargement de la liste:", err);
+                loader.style.display = 'none';
             });
         }
     </script>
