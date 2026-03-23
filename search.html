@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rechercher sur Floy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --f-bg: #000000;
+            --f-accent: #FF7A1A; /* Orange Floy */
+            --f-card: #121212;
+            --f-text: #ffffff;
+            --f-dim: #8e8e8e;
+            --f-border: #262626;
+        }
+
+        body { 
+            background: var(--f-bg); color: var(--f-text); 
+            font-family: -apple-system, system-ui, sans-serif; 
+            margin: 0; padding: 0; 
+        }
+
+        /* --- HEADER DE RECHERCHE --- */
+        header {
+            position: sticky; top: 0; z-index: 1000;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(15px);
+            padding: 15px; display: flex; align-items: center; gap: 15px;
+            border-bottom: 1px solid var(--f-border);
+        }
+        .back-btn { font-size: 20px; color: var(--f-accent); cursor: pointer; }
+        
+        .search-wrapper {
+            flex: 1; background: var(--f-card); border-radius: 20px;
+            padding: 8px 15px; display: flex; align-items: center; gap: 10px;
+            border: 1px solid #333;
+        }
+        #search-input {
+            background: transparent; border: none; color: white; flex: 1; font-size: 15px; outline: none;
+        }
+
+        /* --- RESULTATS --- */
+        .results-list { display: flex; flex-direction: column; padding: 10px 0; }
+        
+        .user-card {
+            display: flex; align-items: center; gap: 15px;
+            padding: 12px 20px; cursor: pointer; border-bottom: 0.5px solid var(--f-border);
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .u-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; background: #222; border: 1px solid #333; }
+        .u-info { flex: 1; }
+        .u-name { font-weight: 600; font-size: 16px; display: block; }
+        .u-tag { font-size: 12px; color: var(--f-dim); }
+
+        .empty-state { text-align: center; margin-top: 100px; color: var(--f-dim); }
+        .empty-state i { font-size: 40px; margin-bottom: 15px; color: #222; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <i class="fas fa-arrow-left back-btn" onclick="window.history.back()"></i>
+        <div class="search-wrapper">
+            <i class="fas fa-search" style="color:var(--f-dim)"></i>
+            <input type="text" id="search-input" placeholder="Pseudo de l'ami..." autofocus>
+        </div>
+    </header>
+
+    <main class="results-list" id="results-render">
+        <div class="empty-state">
+            <i class="fas fa-users"></i>
+            <p>Tapez un nom pour trouver quelqu'un sur Floy</p>
+        </div>
+    </main>
+
+    <script type="module">
+        import { db, auth } from './firebase-config.js';
+        import { collection, query, getDocs, where, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const input = document.getElementById('search-input');
+        const render = document.getElementById('results-render');
+
+        auth.onAuthStateChanged(user => { if(!user) window.location.href = "auth.html"; });
+
+        // Fonction de recherche temps réel
+        input.oninput = async (e) => {
+            const val = e.target.value.trim();
+            if(val.length < 1) {
+                render.innerHTML = `<div class="empty-state"><i class="fas fa-users"></i><p>Tapez un nom...</p></div>`;
+                return;
+            }
+
+            // Recherche Firestore (on cherche les pseudos qui commencent par la saisie)
+            const q = query(
+                collection(db, "users"), 
+                where("username", ">=", val),
+                where("username", "<=", val + '\uf8ff'),
+                limit(10)
+            );
+
+            const snap = await getDocs(q);
+            render.innerHTML = "";
+
+            if(snap.empty) {
+                render.innerHTML = `<div class="empty-state"><p>Aucun résultat pour "${val}"</p></div>`;
+                return;
+            }
+
+            snap.forEach(docSnap => {
+                const u = docSnap.data();
+                if(docSnap.id === auth.currentUser.uid) return; // Ne pas s'afficher soi-même
+
+                const div = document.createElement('div');
+                div.className = 'user-card';
+                div.onclick = () => window.location.href = `chat.html?id=${docSnap.id}`;
+
+                div.innerHTML = `
+                    <img src="${u.avatarUrl || 'https://via.placeholder.com/150'}" class="u-img">
+                    <div class="u-info">
+                        <span class="u-name">${u.username}</span>
+                        <span class="u-tag">Utilisateur Floy</span>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color:#333"></i>
+                `;
+                render.appendChild(div);
+            });
+        };
+    </script>
+</body>
+</html>
