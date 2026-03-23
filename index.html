@@ -131,7 +131,7 @@
 
         function loadUsers(myUid) {
             // On affiche tous les utilisateurs (sauf moi)
-            const q = query(collection(db, "users"), orderBy("username", "asc"));
+            const q = query(collection(db, "Utilisateurs"), orderBy("username", "asc"));
             
             onSnapshot(q, (snap) => {
                 inbox.innerHTML = "";
