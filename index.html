@@ -156,10 +156,13 @@
             // On écoute la collection "Utilisateurs" (U majuscule comme dans ta console)
             const q = query(collection(db, "Utilisateurs"), orderBy("username", "asc"));
             
-            onSnapshot(q, (snap) => {
-                inbox.innerHTML = "";
-                if(snap.empty) {
-                    inbox.innerHTML = "<p style='text-align:center; color:#444; margin-top:50px;'>Aucun utilisateur trouvé</p>";
+            onSnapshot(doc(db, "Utilisateurs", user.uid), (doc) => {
+            if (doc.exists()) {
+                const userData = doc.data();
+                // Mise à jour du mini profil (avatar en haut à gauche)
+                const miniAvatar = document.getElementById('my-avatar-img');
+                if(miniAvatar) {
+                    miniAvatar.src = userData.avatarUrl || 'https://via.placeholder.com/40';
                 }
 
                 snap.forEach(docSnap => {
