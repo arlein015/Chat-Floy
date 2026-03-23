@@ -3,9 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chat Floy | Messenger</title>
-    
+    <title>Messages | Floy Chat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <meta name="theme-color" content="#000000">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-background">
+    <style>
+        :root {
+            --floy-bg: #000000;
+            --floy-card: #121212;
+            --floy-accent: #FF7A1A; /* Ton orange signature */
+            --floy-border: #262626;
+            --floy-text: #ffffff;
+            --floy-dim: #a8a8a8;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        
+        body { 
+            background-color: var(--floy-bg); 
+            color: var(--floy-text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0; padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- NAVIGATION HAUTE (FIXE) --- */
+        .inbox-nav {
+            position: sticky; top: 0; z-index: 1000;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            padding: 15px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--floy-border);
+        }
+
+        .nav-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+        .nav-icons { display: flex; gap: 20px; font-size: 18px; color: var(--floy-accent); cursor: pointer; }
+
+        /* --- BARRE DE RECHERCHE --- */
+        .search-container { padding: 10px 20px; margin-top: 5px; }
+        .search-box {
+            background: var(--floy-card);
+            border-radius: 12px;
+            padding: 10px 15px;
+            display: flex; align-items: center; gap: 10px;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
+        .search-box:focus-within { border-color: var(--floy-accent); }
+        .search-box input {
+            background: transparent; border: none; color: white; width: 100%; font-size: 15px;
+        }
+
+        /* --- LISTE DES CONTACTS --- */
+        .chat-list { display: flex; flex-direction: column; padding-bottom: 80px; }
+
+        .chat-item {
+            display: flex; align-items: center; gap: 15px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+        }
+        .chat-item:active { background: #1a1a1a; }
+        
+        /* Avatar avec point "Online" */
+        .avatar-wrap { position: relative; flex-shrink: 0; }
+        .u-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #222; }
+        .online-dot {
+            position: absolute; bottom: 2px; right: 2px;
+            width: 14px; height: 14px; background: #31a24c;
+            border-radius: 50%; border: 3px solid var(--floy-bg);
+            display: none; /* Activé par JS */
+        }
+
+        .item-body { flex: 1; min-width: 0; }
+        .item-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .u-name { font-weight: 700; font-size: 16px; color: #fff; }
+        .m-time { font-size: 12px; color: var(--floy-dim); }
+
+        .item-preview {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; color: var(--floy-dim);
+        }
+        .last-msg { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; padding-right: 10px; }
+        
+        /* Badge de notification Floy */
+        .unread-badge {
+            width: 10px; height: 10px; background: var(--floy-accent);
+            border-radius: 50%; display: none;
+        }
+        .chat-item.unread .unread-badge { display: block; }
+        .chat-item.unread .last-msg { color: #fff; font-weight: 700; }
+
+        /* --- BARRE DE NAVIGATION BASSE (STYLE MOBILE) --- */
+        .floy-tabbar {
+            position: fixed; bottom: 0; width: 100%;
+            background: rgba(0,0,0,0.9); border-top: 1px solid var(--floy-border);
+            display: flex; justify-content: space-around; padding: 12px 0;
+            backdrop-filter: blur(10px);
+        }
+        .tab-item { color: var(--floy-dim); font-size: 20px; text-align: center; cursor: pointer; }
+        .tab-item.active { color: var(--floy-accent); }
+
+        /* LOADER INITIAL */
+        #floy-screen {
+            position: fixed; inset: 0; background: #000; z-index: 5000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .logo-anim { font-size: 35px; font-weight: 900; color: var(--floy-accent); letter-spacing: 10px; animation: glow 1.5s infinite ease-in-out; }
+        @keyframes glow { 0%, 100% { text-shadow: 0 0 5px var(--floy-accent); opacity: 1; } 50% { text-shadow: 0 0 20px var(--floy-accent); opacity: 0.6; } }
+
+    </style>
+</head>
+<body>
+
+    <div id="floy-screen">
+        <div class="logo-anim">FLOY</div>
+        <p style="color:#555; margin-top:20px; font-size:12px; font-weight:600;">CHARGEMENT DES DISCUSSIONS...</p>
+    </div>
+
+    <nav class="inbox-nav">
+        <div class="nav-title">Messages</div>
+        <div class="nav-icons">
+            <i class="fas fa-camera" onclick="alert('Lancer la Story')"></i>
+            <i class="fas fa-edit" onclick="alert('Nouveau Message')"></i>
+        </div>
+    </nav>
+
+    <div class="search-container">
+        <div class="search-box">
+            <i class="fas fa-search" style="color:var(--floy-dim)"></i>
+            <input type="text" placeholder="Rechercher des amis sur Floy...">
+        </div>
+    </div>
+
+    <main class="chat-list" id="ui-inbox">
+        </main>
+
+    <footer class="floy-tabbar">
+        <div class="tab-item" onclick="location.href='index.html'"><i class="fas fa-home"></i></div>
+        <div class="tab-item active"><i class="fas fa-comment-dots"></i></div>
+        <div class="tab-item"><i class="fas fa-compass"></i></div>
+        <div class="tab-item" onclick="location.href='profil.html'"><i class="fas fa-user-circle"></i></div>
+    </footer>
+
+    <script type="module">
+        import { db, auth } from './firebase-config.js';
+        import { collection, query, orderBy, onSnapshot, getDocs, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const inboxUI = document.getElementById('ui-inbox');
+
+        // Retirer le loader après 2 secondes
+        setTimeout(() => { document.getElementById('floy-screen').style.display = 'none'; }, 2000);
+
+        /**
+         * CHARGEMENT DES DISCUSSIONS EN TEMPS RÉEL
+         */
+        auth.onAuthStateChanged(user => {
+            if(user) {
+                syncInbox(user.uid);
+            }
+        });
+
+        async function syncInbox(myId) {
+            // Dans un vrai projet, on écoute la collection "conversations"
+            // Pour Floy, on va lister les utilisateurs disponibles
+            const usersRef = collection(db, "users");
+            
+            onSnapshot(usersRef, (snap) => {
+                inboxUI.innerHTML = "";
+                snap.forEach(userDoc => {
+                    const u = userDoc.data();
+                    if(userDoc.id === myId) return; // Ne pas s'afficher soi-même
+
+                    // Création de l'élément de liste
+                    const item = document.createElement('div');
+                    item.className = 'chat-item';
+                    
+                    // On simule une notification aléatoire pour le test UI
+                    if(Math.random() > 0.7) item.classList.add('unread');
+
+                    item.onclick = () => {
+                        // Rediriger vers la discussion spécifique
+                        window.location.href = `chat.html?id=${userDoc.id}&name=${u.username}`;
+                    };
+
+                    item.innerHTML = `
+                        <div class="avatar-wrap">
+                            <img src="${u.avatarUrl || 'https://via.placeholder.com/150'}" class="u-avatar">
+                            <div class="online-dot" style="display: ${u.isOnline ? 'block' : 'none'}"></div>
+                        </div>
+                        <div class="item-body">
+                            <div class="item-top">
+                                <span class="u-name">${u.username} ${u.isVerified ? '<i class="fas fa-check-circle" style="color:var(--floy-accent); font-size:12px;"></i>' : ''}</span>
+                                <span class="m-time">14:32</span>
+                            </div>
+                            <div class="item-preview">
+                                <span class="last-msg">Salut ! J'ai vu ton nouveau projet Floy, c'est du lourd !</span>
+                                <div class="unread-badge"></div>
+                            </div>
+                        </div>
+                    `;
+                    inboxUI.appendChild(item);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
