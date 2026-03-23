@@ -2,7 +2,17 @@ import { db, auth } from './firebase-config.js';
 import { collectionGroup, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 export const NotificationService = {
-    audio: new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3'), // Son discret
+    init() {
+        // Au lieu de demander tout de suite, on attend un clic sur le document
+        document.addEventListener('click', () => {
+            if (Notification.permission !== "granted") {
+                Notification.requestPermission();
+            }
+        }, { once: true }); // Ne s'exécute qu'une seule fois
+        
+        // ... le reste de ton code d'écoute des messages
+    }
+}
 
     async requestPermission() {
         if (!("Notification" in window)) return;
