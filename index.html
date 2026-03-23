@@ -2,142 +2,384 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Floy | Messenger</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Floy | Dashboard Messenger</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
+        /* --- CONFIGURATION DES VARIABLES (THEME FLOY) --- */
         :root {
             --f-bg: #000000;
             --f-accent: #FF7A1A;
+            --f-accent-dim: rgba(255, 122, 26, 0.15);
             --f-card: #121212;
+            --f-card-hover: #1c1c1e;
             --f-text: #ffffff;
             --f-dim: #8e8e8e;
             --f-border: #1c1c1e;
+            --f-online: #34c759;
+            --f-danger: #ff3b30;
+            --safe-top: env(safe-area-inset-top);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background: var(--f-bg); color: var(--f-text); 
-            font-family: -apple-system, system-ui, sans-serif; 
-            margin: 0; padding: 0; overflow-x: hidden;
+        /* --- RESET & BASE --- */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        html, body { 
+            height: 100%; margin: 0; padding: 0; 
+            background: var(--f-bg); color: var(--f-text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
         }
 
-        /* --- HEADER --- */
+        /* --- LOADER DYNAMIQUE (ROND QUI TOURNE) --- */
+        #floy-main-loader {
+            position: fixed; inset: 0; background: var(--f-bg);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 10000; transition: opacity 0.5s ease;
+        }
+        .spinner-ring {
+            width: 60px; height: 60px;
+            border: 4px solid var(--f-accent-dim);
+            border-top: 4px solid var(--f-accent);
+            border-radius: 50%;
+            animation: floy-spin 0.8s linear infinite;
+        }
+        .loader-logo {
+            margin-top: 25px; font-weight: 900; font-size: 24px;
+            letter-spacing: 8px; color: var(--f-accent);
+            animation: floy-pulse 1.5s infinite;
+        }
+        @keyframes floy-spin { to { transform: rotate(360deg); } }
+        @keyframes floy-pulse { 0%, 100% { opacity: 0.4; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1); } }
+
+        /* --- HEADER & NAVIGATION --- */
         header {
-            position: sticky; top: 0; z-index: 1000;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
-            padding: 12px 18px; display: flex; align-items: center;
-            justify-content: space-between; border-bottom: 1px solid var(--f-border);
+            position: sticky; top: 0; z-index: 900;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(15px);
+            padding: calc(15px + var(--safe-top)) 20px 15px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--f-border);
         }
-        .my-avatar-wrapper {
-            width: 38px; height: 38px; border-radius: 50%;
-            border: 2px solid var(--f-accent); overflow: hidden; cursor: pointer;
+        .nav-left, .nav-right { width: 40px; display: flex; align-items: center; }
+        .nav-right { justify-content: flex-end; }
+        
+        .profile-trigger {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: 2px solid var(--f-accent); cursor: pointer;
+            overflow: hidden; transition: transform 0.2s;
         }
-        .my-avatar-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-        .app-logo { font-size: 22px; font-weight: 900; color: var(--f-accent); letter-spacing: 4px; margin: 0; }
+        .profile-trigger:active { transform: scale(0.9); }
+        .profile-trigger img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* --- LISTE --- */
-        .inbox-list { display: flex; flex-direction: column; padding-top: 10px; }
-        .chat-card {
-            display: flex; align-items: center; gap: 15px;
-            padding: 15px 20px; cursor: pointer; 
-            transition: background 0.2s; border-bottom: 0.5px solid var(--f-border);
+        .logo-text {
+            font-size: 20px; font-weight: 900; color: var(--f-accent);
+            letter-spacing: 5px; margin: 0; text-align: center;
         }
-        .chat-card:active { background: #111; }
-        .u-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; background: #222; }
-        .u-name { font-weight: 700; font-size: 16px; margin-bottom: 4px; display: block; }
-        .u-preview { font-size: 14px; color: var(--f-dim); }
 
-        /* --- LOADER --- */
-        #floy-loader {
-            position: fixed; inset: 0; background: #000; z-index: 2000;
-            display: flex; align-items: center; justify-content: center;
+        .menu-btn { cursor: pointer; display: flex; align-items: center; }
+
+        /* --- BARRE DE RECHERCHE --- */
+        .search-section { padding: 15px 20px; }
+        .search-wrapper {
+            background: var(--f-card); border-radius: 15px;
+            padding: 12px 18px; display: flex; align-items: center; gap: 12px;
+            border: 1px solid var(--f-border); transition: 0.3s;
         }
-        .pulse { animation: pulse-orange 1.5s infinite; }
-        @keyframes pulse-orange {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
+        .search-wrapper:focus-within { border-color: var(--f-accent); background: #1a1a1a; }
+        .search-wrapper input {
+            background: transparent; border: none; color: white;
+            flex: 1; font-size: 16px;
         }
+
+        /* --- STORIES (Optionnel mais stylé) --- */
+        .stories-container {
+            display: flex; gap: 15px; overflow-x: auto; padding: 10px 20px;
+            scrollbar-width: none;
+        }
+        .stories-container::-webkit-scrollbar { display: none; }
+        .story-item {
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            min-width: 70px; cursor: pointer;
+        }
+        .story-circle {
+            width: 64px; height: 64px; border-radius: 50%;
+            padding: 3px; border: 2.5px solid var(--f-accent);
+        }
+        .story-circle img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #222; }
+        .story-name { font-size: 11px; color: var(--f-dim); max-width: 65px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* --- LISTE DES DISCUSSIONS --- */
+        .content-main { padding-bottom: 100px; }
+        .section-header {
+            padding: 20px 20px 10px; display: flex; justify-content: space-between;
+            align-items: center;
+        }
+        .section-header h2 { font-size: 14px; color: var(--f-dim); text-transform: uppercase; letter-spacing: 1.5px; margin: 0; }
+        
+        .chat-list { display: flex; flex-direction: column; }
+        .chat-item {
+            display: flex; align-items: center; gap: 16px;
+            padding: 14px 20px; cursor: pointer; position: relative;
+            transition: background 0.2s;
+        }
+        .chat-item:active { background: var(--f-card); }
+        
+        .avatar-box { position: relative; }
+        .avatar-box img { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; background: #222; }
+        .status-dot {
+            position: absolute; bottom: 3px; right: 3px;
+            width: 14px; height: 14px; border-radius: 50%;
+            background: var(--f-online); border: 3px solid var(--f-bg);
+            display: none; /* JS Toggle */
+        }
+        .status-dot.active { display: block; }
+
+        .chat-details { flex: 1; overflow: hidden; border-bottom: 0.5px solid var(--f-border); padding-bottom: 14px; }
+        .chat-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .u-name { font-weight: 700; font-size: 16px; color: var(--f-text); }
+        .u-time { font-size: 12px; color: var(--f-dim); }
+        .u-msg { 
+            font-size: 14px; color: var(--f-dim); 
+            display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        /* --- SKELETON LOADERS (Pour l'effet pro) --- */
+        .skeleton { background: #1a1a1a; position: relative; overflow: hidden; border-radius: 4px; }
+        .skeleton::after {
+            content: ""; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shiver 1.5s infinite;
+        }
+        @keyframes shiver { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+        /* --- COMPOSANTS DE NOTIFICATION --- */
+        #floy-toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: var(--f-accent); color: #000; padding: 12px 24px;
+            border-radius: 30px; font-weight: bold; z-index: 1000;
+            display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* --- TAB BAR (BAS DE PAGE) --- */
+        .tab-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(20px);
+            border-top: 1px solid var(--f-border);
+            display: flex; justify-content: space-around;
+            padding: 12px 10px calc(12px + env(safe-area-inset-bottom));
+            z-index: 900;
+        }
+        .tab-item { cursor: pointer; opacity: 0.5; transition: 0.3s; }
+        .tab-item.active { opacity: 1; color: var(--f-accent); }
     </style>
 </head>
 <body>
 
-    <div id="floy-loader">
-        <div class="pulse"><h1 class="app-logo">FLOY</h1></div>
+    <div id="floy-main-loader">
+        <div class="spinner-ring"></div>
+        <div class="loader-logo">FLOY</div>
     </div>
 
     <header>
-        <div class="my-avatar-wrapper" onclick="window.location.href='profile-edit.html'">
-            <img id="my-avatar-img" src="https://via.placeholder.com/40">
+        <div class="nav-left">
+            <div class="profile-trigger" onclick="window.location.href='profile-edit.html'">
+                <img id="my-profile-pic" src="https://via.placeholder.com/40" alt="Moi">
+            </div>
         </div>
-        <h1 class="app-logo">FLOY</h1>
-        <div onclick="window.location.href='menu.html'" style="cursor:pointer">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF7A1A" stroke-width="2.5" stroke-linecap="round"><path d="M4 6H20M4 12H20M4 18H20"/></svg>
+        
+        <h1 class="logo-text">FLOY</h1>
+
+        <div class="nav-right">
+            <div class="menu-btn" onclick="window.location.href='menu.html'">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                    <path d="M4 6H20M4 12H20M4 18H20" stroke="var(--f-accent)" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+            </div>
         </div>
     </header>
 
-    <main class="inbox-list" id="inbox-render"></main>
+    <div class="search-section">
+        <div class="search-wrapper">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--f-dim)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="floy-search" placeholder="Rechercher des membres...">
+        </div>
+    </div>
+
+    <div class="stories-container" id="stories-render">
+        <div class="story-item">
+            <div class="story-circle" style="border-style: dashed; border-color: #333;">
+                <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#333;">
+                    <i class="fas fa-plus"></i>
+                </div>
+            </div>
+            <span class="story-name">Ma Story</span>
+        </div>
+    </div>
+
+    <div class="content-main">
+        <div class="section-header">
+            <h2>Discussions Recentes</h2>
+            <i class="fas fa-ellipsis-h" style="color:var(--f-dim); font-size:12px;"></i>
+        </div>
+
+        <div class="chat-list" id="chat-list-render">
+            <div class="chat-item">
+                <div class="avatar-box"><div class="u-img skeleton" style="width:58px; height:58px; border-radius:50%;"></div></div>
+                <div class="chat-details">
+                    <div class="chat-top"><div class="skeleton" style="width:100px; height:15px;"></div></div>
+                    <div class="skeleton" style="width:180px; height:12px; margin-top:8px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="tab-bar">
+        <div class="tab-item active">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+        </div>
+        <div class="tab-item" onclick="window.location.href='search.html'">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </div>
+        <div class="tab-item">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8A6 6 0 0 0 6 8C6 12 4 14 4 14H20C20 14 18 12 18 8Z"></path></svg>
+        </div>
+        <div class="tab-item" onclick="window.location.href='menu.html'">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1V15a2 2 0 0 1-2-2 2 2 0 0 1 2-2v-.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2v.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </div>
+    </nav>
+
+    <div id="floy-toast">Nouveau message reçu !</div>
 
     <script type="module">
         import { db, auth } from './firebase-config.js';
-        import { collection, query, onSnapshot, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { collection, query, onSnapshot, orderBy, doc, getDoc, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        // Modules experts
         import { PresenceManager } from './presence-manager.js';
         import { NotificationService } from './notification-service.js';
 
-        const inbox = document.getElementById('inbox-render');
-        const loader = document.getElementById('floy-loader');
+        const chatList = document.getElementById('chat-list-render');
+        const loader = document.getElementById('floy-main-loader');
+        const searchInput = document.getElementById('floy-search');
+        let allUsers = [];
 
+        // --- INITIALISATION ---
         auth.onAuthStateChanged(async (user) => {
-            if(!user) {
+            if (!user) {
                 window.location.href = "auth.html";
             } else {
-                PresenceManager.init();
-                PresenceManager.setStatus(true);
-                NotificationService.init();
+                try {
+                    // Lancement des services
+                    PresenceManager.init();
+                    PresenceManager.setStatus(true);
+                    NotificationService.init();
 
-                // Charger mon avatar
-                const mySnap = await getDoc(doc(db, "Utilisateurs", user.uid));
-                if(mySnap.exists()) {
-                    document.getElementById('my-avatar-img').src = mySnap.data().avatarUrl || 'https://via.placeholder.com/40';
+                    // Récupérer mon profil (Source de vérité)
+                    onSnapshot(doc(db, "Utilisateurs", user.uid), (myDoc) => {
+                        if(myDoc.exists()) {
+                            document.getElementById('my-profile-pic').src = myDoc.data().avatarUrl || 'https://via.placeholder.com/40';
+                        }
+                    });
+
+                    // Charger les membres
+                    fetchUsers(user.uid);
+                } catch (err) {
+                    console.error("Erreur Init:", err);
+                    loader.style.opacity = "0";
+                    setTimeout(() => loader.remove(), 500);
                 }
-                
-                // Charger la liste des membres
-                loadInbox(user.uid);
             }
         });
 
-        function loadInbox(myUid) {
-            const q = query(collection(db, "Utilisateurs"), orderBy("username", "asc"));
+        // --- FONCTION DE CHARGEMENT DES MEMBRES ---
+        function fetchUsers(myUid) {
+            const q = query(collection(db, "Utilisateurs"), orderBy("isOnline", "desc"), limit(50));
             
-            // Correction de la syntaxe ici (Ligne 194 environ)
-            onSnapshot(q, (snap) => {
-                inbox.innerHTML = "";
-                snap.forEach(docSnap => {
-                    const u = docSnap.data();
-                    if(docSnap.id === myUid) return;
-
-                    const card = document.createElement('div');
-                    card.className = 'chat-card';
-                    card.onclick = () => { window.location.href = `chat.html?id=${docSnap.id}`; };
-
-                    card.innerHTML = `
-                        <img src="${u.avatarUrl || 'https://via.placeholder.com/55'}" class="u-img">
-                        <div class="chat-info">
-                            <span class="u-name">${u.username}</span>
-                            <div class="u-preview">En ligne sur Floy</div>
-                        </div>
-                    `;
-                    inbox.appendChild(card);
-                });
+            onSnapshot(q, (snapshot) => {
+                allUsers = [];
+                chatList.innerHTML = "";
                 
-                // On cache le loader une fois que les données sont là
-                loader.style.display = 'none';
+                if(snapshot.empty) {
+                    chatList.innerHTML = "<div style='text-align:center; padding:50px; color:#444;'>Aucun membre trouvé sur Floy</div>";
+                }
+
+                snapshot.forEach(docSnap => {
+                    const u = docSnap.data();
+                    if(docSnap.id !== myUid) {
+                        allUsers.push({ id: docSnap.id, ...u });
+                        renderUserCard(u, docSnap.id);
+                        renderStory(u, docSnap.id);
+                    }
+                });
+
+                // Cacher le loader après le premier chargement réussi
+                loader.style.opacity = "0";
+                setTimeout(() => loader.style.display = 'none', 500);
             }, (error) => {
-                console.error("Erreur Firestore:", error);
+                console.error("Erreur Permission Firestore (Rules):", error);
+                // Si erreur, on cache quand même le loader pour voir l'erreur
                 loader.style.display = 'none';
+                alert("Erreur de permission : Vérifiez vos règles Firestore.");
             });
         }
+
+        // --- RENDU D'UNE CARTE UTILISATEUR ---
+        function renderUserCard(u, id) {
+            const onlineClass = u.isOnline ? 'active' : '';
+            const card = document.createElement('div');
+            card.className = 'chat-item';
+            card.onclick = () => window.location.href = `chat.html?id=${id}`;
+
+            card.innerHTML = `
+                <div class="avatar-box">
+                    <img src="${u.avatarUrl || 'https://via.placeholder.com/150'}" alt="${u.username}">
+                    <div class="status-dot ${onlineClass}"></div>
+                </div>
+                <div class="chat-details">
+                    <div class="chat-top">
+                        <span class="u-name">${u.username}</span>
+                        <span class="u-time">Maintenant</span>
+                    </div>
+                    <span class="u-msg">Cliquez pour démarrer une conversation sécurisée...</span>
+                </div>
+            `;
+            chatList.appendChild(card);
+        }
+
+        // --- RENDU DES STORIES ---
+        function renderStory(u, id) {
+            const container = document.getElementById('stories-render');
+            const story = document.createElement('div');
+            story.className = 'story-item';
+            story.innerHTML = `
+                <div class="story-circle">
+                    <img src="${u.avatarUrl || 'https://via.placeholder.com/150'}">
+                </div>
+                <span class="story-name">${u.username}</span>
+            `;
+            container.appendChild(story);
+        }
+
+        // --- SYSTEME DE RECHERCHE EN TEMPS RÉEL ---
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allUsers.filter(u => u.username.toLowerCase().includes(term));
+            
+            chatList.innerHTML = "";
+            filtered.forEach(u => renderUserCard(u, u.id));
+        });
+
+        // --- GESTION DES NOTIFICATIONS VISUELLES ---
+        window.showFloyToast = (msg) => {
+            const toast = document.getElementById('floy-toast');
+            toast.innerText = msg;
+            toast.style.display = "block";
+            setTimeout(() => { toast.style.display = "none"; }, 3000);
+        };
+
     </script>
 </body>
 </html>
