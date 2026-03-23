@@ -8,72 +8,41 @@
     <style>
         :root {
             --f-bg: #000000;
-            --f-accent: #FF7A1A; /* Orange Floy */
+            --f-accent: #FF7A1A;
             --f-card: #121212;
             --f-text: #ffffff;
             --f-dim: #8e8e8e;
             --f-border: #262626;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { 
-            background: var(--f-bg); color: var(--f-text); 
-            font-family: -apple-system, system-ui, sans-serif; 
-            margin: 0; padding: 0; 
-        }
+        body { background: var(--f-bg); color: var(--f-text); font-family: sans-serif; margin: 0; padding: 0; }
 
-        /* --- HEADER AVEC PROFIL --- */
         header {
             position: sticky; top: 0; z-index: 1000;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(15px);
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
             padding: 10px 15px; display: flex; align-items: center;
             justify-content: space-between; border-bottom: 1px solid var(--f-border);
         }
         .user-trigger { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .my-avatar { 
-            width: 38px; height: 38px; border-radius: 50%; 
-            object-fit: cover; border: 1.5px solid var(--f-accent); 
-            background: #222;
-        }
-        .app-logo { 
-            font-size: 20px; font-weight: 900; color: var(--f-accent); 
-            letter-spacing: 3px; margin: 0;
-        }
-        .header-icons { display: flex; gap: 18px; color: var(--f-dim); font-size: 18px; }
+        .my-avatar { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--f-accent); background: #222; }
+        .app-logo { font-size: 20px; font-weight: 900; color: var(--f-accent); letter-spacing: 3px; }
 
-        /* --- BARRE DE RECHERCHE --- */
-        .search-area { padding: 15px; }
+        .search-area { padding: 15px; cursor: pointer; }
         .search-bar {
             background: var(--f-card); border-radius: 10px;
             padding: 10px 15px; display: flex; align-items: center; gap: 10px;
-        }
-        .search-bar input {
-            background: transparent; border: none; color: white; flex: 1; font-size: 15px;
+            color: var(--f-dim); border: 1px solid #222;
         }
 
-        /* --- LISTE DES CHATS --- */
-        .inbox-list { display: flex; flex-direction: column; padding-bottom: 80px; }
+        .inbox-list { display: flex; flex-direction: column; }
         .chat-item {
             display: flex; align-items: center; gap: 15px;
-            padding: 12px 15px; cursor: pointer; transition: 0.2s;
+            padding: 12px 15px; cursor: pointer; border-bottom: 0.5px solid var(--f-border);
         }
-        .chat-item:active { background: #1a1a1a; }
-
-        .avatar-box { position: relative; flex-shrink: 0; }
         .u-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; background: #222; }
-        .online-badge {
-            position: absolute; bottom: 2px; right: 2px;
-            width: 12px; height: 12px; background: #31a24c;
-            border-radius: 50%; border: 2px solid var(--f-bg);
-        }
+        .u-name { font-weight: 600; font-size: 16px; display: block; }
+        .u-msg { font-size: 14px; color: var(--f-dim); }
 
-        .chat-info { flex: 1; min-width: 0; border-bottom: 0.5px solid var(--f-border); padding-bottom: 12px; }
-        .chat-row-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
-        .u-name { font-weight: 600; font-size: 16px; }
-        .u-time { font-size: 12px; color: var(--f-dim); }
-        .u-msg { font-size: 14px; color: var(--f-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* LOADER */
         #floy-loader {
             position: fixed; inset: 0; background: #000; z-index: 2000;
             display: flex; align-items: center; justify-content: center;
@@ -90,21 +59,16 @@
         <div class="user-trigger" onclick="window.location.href='profile-edit.html'">
             <img id="my-avatar" src="https://via.placeholder.com/40" class="my-avatar">
         </div>
-        
         <h1 class="app-logo">FLOY</h1>
-
-        <div class="header-icons">
-            <i class="fas fa-camera"></i>
-            <i class="fas fa-edit" style="color: var(--f-accent);"></i>
-        </div>
+        <i class="fas fa-edit" style="color: var(--f-accent); font-size: 18px;"></i>
     </header>
 
-    <div class="search-area" onclick="window.location.href='search.html'" style="cursor:pointer;">
-    <div class="search-bar">
-        <i class="fas fa-search" style="color:var(--f-dim)"></i>
-        <span style="color:var(--f-dim)">Rechercher un ami sur Floy...</span>
+    <div class="search-area" onclick="window.location.href='search.html'">
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <span>Rechercher un ami sur Floy...</span>
+        </div>
     </div>
-</div>
 
     <main class="inbox-list" id="inbox-render"></main>
 
@@ -114,23 +78,27 @@
 
         const inbox = document.getElementById('inbox-render');
 
+        // FORCE L'ARRET DU LOADER IMMEDIATEMENT
+        document.getElementById('floy-loader').style.display = 'none';
+
         auth.onAuthStateChanged(async (user) => {
             if(!user) {
                 window.location.href = "auth.html";
             } else {
-                // 1. Charger mes infos pour le header
-                const mySnap = await getDoc(doc(db, "users", user.uid));
-                if(mySnap.exists()) {
-                    document.getElementById('my-avatar').src = mySnap.data().avatarUrl || 'https://via.placeholder.com/40';
-                }
+                // Charger mon avatar
+                try {
+                    const mySnap = await getDoc(doc(db, "Utilisateurs", user.uid));
+                    if(mySnap.exists()) {
+                        document.getElementById('my-avatar').src = mySnap.data().avatarUrl || 'https://via.placeholder.com/40';
+                    }
+                } catch(e) { console.error("Erreur Profil:", e); }
                 
-                document.getElementById('floy-loader').style.display = 'none';
                 loadUsers(user.uid);
             }
         });
 
         function loadUsers(myUid) {
-            // On affiche tous les utilisateurs (sauf moi)
+            // Utilisation de "Utilisateurs" comme dans ta console Firebase
             const q = query(collection(db, "Utilisateurs"), orderBy("username", "asc"));
             
             onSnapshot(q, (snap) => {
@@ -144,20 +112,19 @@
                     div.onclick = () => window.location.href = `chat.html?id=${docSnap.id}`;
 
                     div.innerHTML = `
-                        <div class="avatar-box">
-                            <img src="${u.avatarUrl || 'https://via.placeholder.com/150'}" class="u-img">
-                            ${u.isOnline ? '<div class="online-badge"></div>' : ''}
+                        <img src="${u.avatarUrl || 'https://via.placeholder.com/150'}" class="u-img">
+                        <div style="flex:1">
+                            <span class="u-name">${u.username}</span>
+                            <div class="u-msg">Démarrer une discussion</div>
                         </div>
-                        <div class="chat-info">
-                            <div class="chat-row-top">
-                                <span class="u-name">${u.username}</span>
-                                <span class="u-time">12:00</span>
-                            </div>
-                            <div class="u-msg">Démarrer une discussion sur Floy...</div>
-                        </div>
+                        <i class="fas fa-chevron-right" style="color:#222"></i>
                     `;
                     inbox.appendChild(div);
                 });
+            }, (error) => {
+                console.error("Erreur Firebase:", error);
+                // Si l'erreur permission-denied s'affiche ici, 
+                // c'est qu'il faut vraiment publier les règles sur Firebase.
             });
         }
     </script>
