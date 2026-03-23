@@ -22,7 +22,7 @@
             margin: 0; padding: 0; overflow-x: hidden;
         }
 
-        /* --- HEADER AVEC SVG --- */
+        /* --- HEADER --- */
         header {
             position: sticky; top: 0; z-index: 1000;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
@@ -34,47 +34,25 @@
             border: 2px solid var(--f-accent); overflow: hidden; cursor: pointer;
         }
         .my-avatar-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-        
         .app-logo { font-size: 22px; font-weight: 900; color: var(--f-accent); letter-spacing: 4px; margin: 0; }
 
-        /* --- ZONE DE RECHERCHE --- */
-        .search-container { padding: 15px; }
-        .search-bar-fake {
-            background: var(--f-card); border-radius: 12px;
-            padding: 12px 15px; display: flex; align-items: center; gap: 12px;
-            color: var(--f-dim); cursor: pointer; border: 1px solid #222;
-        }
-
-        /* --- LISTE DES DISCUSSIONS --- */
-        .inbox-title { padding: 0 20px 10px 20px; font-size: 13px; color: var(--f-dim); text-transform: uppercase; letter-spacing: 1px; }
-        .inbox-list { display: flex; flex-direction: column; }
-        
+        /* --- LISTE --- */
+        .inbox-list { display: flex; flex-direction: column; padding-top: 10px; }
         .chat-card {
             display: flex; align-items: center; gap: 15px;
             padding: 15px 20px; cursor: pointer; 
             transition: background 0.2s; border-bottom: 0.5px solid var(--f-border);
         }
         .chat-card:active { background: #111; }
-
-        .u-avatar-container { position: relative; }
         .u-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; background: #222; }
-        .online-dot { 
-            width: 14px; height: 14px; background: #34c759; border: 3px solid #000; 
-            border-radius: 50%; position: absolute; bottom: 2px; right: 2px; 
-            display: none; /* Affiché via JS si en ligne */
-        }
-
-        .chat-info { flex: 1; overflow: hidden; }
         .u-name { font-weight: 700; font-size: 16px; margin-bottom: 4px; display: block; }
-        .u-preview { font-size: 14px; color: var(--f-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .u-preview { font-size: 14px; color: var(--f-dim); }
 
         /* --- LOADER --- */
         #floy-loader {
             position: fixed; inset: 0; background: #000; z-index: 2000;
             display: flex; align-items: center; justify-content: center;
         }
-
-        /* Animation de flottement pour le logo au chargement */
         .pulse { animation: pulse-orange 1.5s infinite; }
         @keyframes pulse-orange {
             0% { transform: scale(1); opacity: 0.8; }
@@ -86,43 +64,24 @@
 <body>
 
     <div id="floy-loader">
-        <div class="pulse">
-            <h1 class="app-logo">FLOY</h1>
-        </div>
+        <div class="pulse"><h1 class="app-logo">FLOY</h1></div>
     </div>
 
     <header>
         <div class="my-avatar-wrapper" onclick="window.location.href='profile-edit.html'">
             <img id="my-avatar-img" src="https://via.placeholder.com/40">
         </div>
-        
         <h1 class="app-logo">FLOY</h1>
-
-        <div onclick="window.location.href='menu.html'" style="cursor:pointer; display: flex; align-items: center;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 6H20M4 12H20M4 18H20" stroke="#FF7A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+        <div onclick="window.location.href='menu.html'" style="cursor:pointer">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF7A1A" stroke-width="2.5" stroke-linecap="round"><path d="M4 6H20M4 12H20M4 18H20"/></svg>
         </div>
     </header>
 
-    <div class="search-container" onclick="window.location.href='search.html'">
-        <div class="search-bar-fake">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <span>Rechercher un ami...</span>
-        </div>
-    </div>
-
-    <div class="inbox-title">Messages</div>
-    <main class="inbox-list" id="inbox-render">
-        </main>
+    <main class="inbox-list" id="inbox-render"></main>
 
     <script type="module">
         import { db, auth } from './firebase-config.js';
         import { collection, query, onSnapshot, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        
-        // Import des nouveaux modules experts
         import { PresenceManager } from './presence-manager.js';
         import { NotificationService } from './notification-service.js';
 
@@ -133,66 +92,49 @@
             if(!user) {
                 window.location.href = "auth.html";
             } else {
-                // 1. Démarrer les services en arrière-plan
                 PresenceManager.init();
                 PresenceManager.setStatus(true);
                 NotificationService.init();
 
-                // 2. Charger les infos de mon profil (Collection Utilisateurs)
-                try {
-                    const mySnap = await getDoc(doc(db, "Utilisateurs", user.uid));
-                    if(mySnap.exists()) {
-                        document.getElementById('my-avatar-img').src = mySnap.data().avatarUrl || 'https://via.placeholder.com/40';
-                    }
-                } catch(e) { console.error("Erreur Profil:", e); }
+                // Charger mon avatar
+                const mySnap = await getDoc(doc(db, "Utilisateurs", user.uid));
+                if(mySnap.exists()) {
+                    document.getElementById('my-avatar-img').src = mySnap.data().avatarUrl || 'https://via.placeholder.com/40';
+                }
                 
-                // 3. Charger la liste et cacher le loader
+                // Charger la liste des membres
                 loadInbox(user.uid);
-                setTimeout(() => { loader.style.display = 'none'; }, 800);
             }
         });
 
         function loadInbox(myUid) {
-            // On écoute la collection "Utilisateurs" (U majuscule comme dans ta console)
             const q = query(collection(db, "Utilisateurs"), orderBy("username", "asc"));
             
-            onSnapshot(doc(db, "Utilisateurs", user.uid), (doc) => {
-            if (doc.exists()) {
-                const userData = doc.data();
-                // Mise à jour du mini profil (avatar en haut à gauche)
-                const miniAvatar = document.getElementById('my-avatar-img');
-                if(miniAvatar) {
-                    miniAvatar.src = userData.avatarUrl || 'https://via.placeholder.com/40';
-                }
-
+            // Correction de la syntaxe ici (Ligne 194 environ)
+            onSnapshot(q, (snap) => {
+                inbox.innerHTML = "";
                 snap.forEach(docSnap => {
                     const u = docSnap.data();
-                    if(docSnap.id === myUid) return; // Ne pas s'afficher soi-même
+                    if(docSnap.id === myUid) return;
 
                     const card = document.createElement('div');
                     card.className = 'chat-card';
-                    card.onclick = () => window.location.href = `chat.html?id=${docSnap.id}`;
-
-                    // Affichage du point vert si en ligne
-                    const onlineStatus = u.isOnline ? 'display:block' : 'display:none';
+                    card.onclick = () => { window.location.href = `chat.html?id=${docSnap.id}`; };
 
                     card.innerHTML = `
-                        <div class="u-avatar-container">
-                            <img src="${u.avatarUrl || 'https://via.placeholder.com/150'}" class="u-img">
-                            <div class="online-dot" style="${onlineStatus}"></div>
-                        </div>
+                        <img src="${u.avatarUrl || 'https://via.placeholder.com/55'}" class="u-img">
                         <div class="chat-info">
                             <span class="u-name">${u.username}</span>
-                            <div class="u-preview">Cliquer pour discuter sur Floy</div>
+                            <div class="u-preview">En ligne sur Floy</div>
                         </div>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
                     `;
                     inbox.appendChild(card);
                 });
-            }, (err) => {
-                console.error("Erreur de chargement de la liste:", err);
+                
+                // On cache le loader une fois que les données sont là
+                loader.style.display = 'none';
+            }, (error) => {
+                console.error("Erreur Firestore:", error);
                 loader.style.display = 'none';
             });
         }
