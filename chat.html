@@ -1,1 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Messages | Floy Chat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --f-bg: #000000;
+            --f-card: #121212;
+            --f-accent: #FF7A1A; /* Ton orange Floy */
+            --f-text: #ffffff;
+            --f-dim: #8e8e8e;
+            --f-border: #262626;
+        }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            background: var(--f-bg); color: var(--f-text); 
+            font-family: -apple-system, system-ui, sans-serif; 
+            margin: 0; padding: 0;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
+            padding: 15px 20px; display: flex; align-items: center;
+            justify-content: space-between; border-bottom: 1px solid var(--f-border);
+        }
+        header h1 { font-size: 25px; font-weight: 800; margin: 0; letter-spacing: -1px; }
+
+        /* --- RECHERCHE --- */
+        .search-container { padding: 15px 20px; }
+        .search-bar {
+            background: var(--f-card); border-radius: 10px;
+            padding: 10px 15px; display: flex; align-items: center; gap: 10px;
+        }
+        .search-bar input {
+            background: transparent; border: none; color: white; flex: 1; font-size: 15px;
+        }
+
+        /* --- LISTE DES DISCUSSIONS --- */
+        .inbox-list { display: flex; flex-direction: column; }
+
+        .chat-row {
+            display: flex; align-items: center; gap: 15px;
+            padding: 12px 20px; cursor: pointer; transition: 0.2s;
+        }
+        .chat-row:active { background: #1a1a1a; }
+
+        .avatar-box { position: relative; flex-shrink: 0; }
+        .u-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #222; }
+        
+        /* Point vert En Ligne */
+        .online-status {
+            position: absolute; bottom: 3px; right: 3px;
+            width: 14px; height: 14px; background: #31a24c;
+            border-radius: 50%; border: 3px solid var(--f-bg);
+            display: none; /* Actif via Firebase */
+        }
+
+        .chat-content { flex: 1; min-width: 0; border-bottom: 0.5px solid var(--f-border); padding-bottom: 12px; }
+        .chat-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .u-name { font-weight: 600; font-size: 16px; }
+        .m-time { font-size: 12px; color: var(--f-dim); }
+
+        .chat-preview {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; color: var(--f-dim);
+        }
+        .text-msg { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+
+        /* Badge non-lu Orange */
+        .unread-indicator {
+            width: 10px; height: 10px; background: var(--f-accent);
+            border-radius: 50%; display: none; margin-left: 10px;
+        }
+        .unread .unread-indicator { display: block; }
+        .unread .text-msg { color: #fff; font-weight: 700; }
+
+        /* --- BARRE DE NAVIGATION (TAB BAR) --- */
+        .tab-bar {
+            position: fixed; bottom: 0; width: 100%;
+            background: rgba(0,0,0,0.95); border-top: 1px solid var(--f-border);
+            display: flex; justify-content: space-around; padding: 15px 0;
+            backdrop-filter: blur(10px);
+        }
+        .tab-btn { font-size: 22px; color: var(--f-dim); cursor: pointer; }
+        .tab-btn.active { color: var(--f-accent); }
+
+        /* Loader Floy */
+        #loader {
+            position: fixed; inset: 0; background: #000; z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader"><i class="fas fa-circle-notch fa-spin" style="color:var(--f-accent); font-size:30px;"></i></div>
+
+    <header>
+        <h1>Chats</h1>
+        <div style="display: flex; gap: 20px; font-size: 18px; color: var(--f-accent);">
+            <i class="fas fa-camera"></i>
+            <i class="fas fa-edit"></i>
+        </div>
+    </header>
+
+    <div class="search-container">
+        <div class="search-bar">
+            <i class="fas fa-search" style="color:var(--f-dim)"></i>
+            <input type="text" placeholder="Rechercher sur Chat Floy...">
+        </div>
+    </div>
+
+    <main class="inbox-list" id="inbox-ui">
+        </main>
+
+    <footer class="tab-bar">
+        <div class="tab-btn"><i class="fas fa-home"></i></div>
+        <div class="tab-btn active"><i class="fas fa-comment"></i></div>
+        <div class="tab-btn"><i class="fas fa-compass"></i></div>
+        <div class="tab-btn" onclick="location.href='profile.html'"><i class="fas fa-user-circle"></i></div>
+    </footer>
+
+    <script type="module">
+        import { db, auth } from './firebase-config.js';
+        import { collection, query, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const inboxUI = document.getElementById('inbox-ui');
+
+        auth.onAuthStateChanged(user => {
+            if(!user) {
+                window.location.href = "auth.html"; // Rediriger si pas connecté
+            } else {
+                document.getElementById('loader').style.display = 'none';
+                loadChats(user.uid);
+            }
+        });
+
+        function loadChats(myId) {
+            // On écoute la liste des utilisateurs pour créer des conversations
+            const q = query(collection(db, "users"), orderBy("username", "asc"));
+            
+            onSnapshot(q, (snap) => {
+                inboxUI.innerHTML = "";
+                snap.forEach(docSnap => {
+                    const u = docSnap.data();
+                    if(docSnap.id === myId) return;
+
+                    const row = document.createElement('div');
+                    row.className = 'chat-row';
+                    
+                    // On simule un message non-lu pour le test visuel
+                    if(Math.random() > 0.8) row.classList.add('unread');
+
+                    row.onclick = () => {
+                        window.location.href = `chat.html?id=${docSnap.id}&name=${u.username}`;
+                    };
+
+                    row.innerHTML = `
+                        <div class="avatar-box">
+                            <img src="${u.avatarUrl || 'https://via.placeholder.com/150'}" class="u-avatar">
+                            <div class="online-status" style="display: ${u.isOnline ? 'block' : 'none'}"></div>
+                        </div>
+                        <div class="chat-content">
+                            <div class="chat-header-row">
+                                <span class="u-name">${u.username}</span>
+                                <span class="m-time">12:08</span>
+                            </div>
+                            <div class="chat-preview">
+                                <span class="text-msg">En attente de ton message sur Floy...</span>
+                                <div class="unread-indicator"></div>
+                            </div>
+                        </div>
+                    `;
+                    inboxUI.appendChild(row);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
