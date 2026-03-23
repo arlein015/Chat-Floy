@@ -2,40 +2,134 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion | Floy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bienvenue sur Floy</title>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .card { width: 90%; max-width: 350px; text-align: center; }
-        h1 { color: #FF7A1A; letter-spacing: 5px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #111; color: #fff; }
-        button { width: 100%; padding: 12px; background: #FF7A1A; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        :root {
+            --f-bg: #000;
+            --f-accent: #FF7A1A;
+            --f-card: #121212;
+            --f-text: #fff;
+            --f-dim: #8e8e8e;
+        }
+
+        body { 
+            background: var(--f-bg); color: var(--f-text); 
+            font-family: -apple-system, sans-serif; 
+            margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh;
+        }
+
+        .auth-card { width: 100%; max-width: 350px; padding: 25px; text-align: center; }
+        
+        .logo { font-size: 40px; font-weight: 900; color: var(--f-accent); letter-spacing: 6px; margin-bottom: 40px; }
+
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { font-size: 11px; color: var(--f-dim); text-transform: uppercase; font-weight: 700; margin-left: 10px; }
+        
+        input {
+            width: 100%; background: var(--f-card); border: 1.5px solid #222;
+            padding: 15px; border-radius: 15px; color: #fff; font-size: 16px; outline: none; margin-top: 5px;
+            box-sizing: border-box;
+        }
+        input:focus { border-color: var(--f-accent); }
+
+        .btn-main {
+            width: 100%; background: var(--f-accent); color: #000; border: none;
+            padding: 16px; border-radius: 15px; font-weight: 800; font-size: 16px;
+            cursor: pointer; margin-top: 20px; transition: transform 0.1s;
+        }
+        .btn-main:active { transform: scale(0.98); }
+
+        .toggle-link { margin-top: 25px; font-size: 14px; color: var(--f-dim); cursor: pointer; display: block; }
+        .toggle-link span { color: var(--f-accent); font-weight: bold; }
+
+        #error-msg { color: #ff3b30; font-size: 13px; margin-top: 15px; display: none; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>FLOY</h1>
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="pass" placeholder="Mot de passe">
-        <button id="loginBtn">SE CONNECTER</button>
-        <p id="err" style="color:red; font-size:12px; display:none;"></p>
+
+    <div class="auth-card">
+        <div class="logo">FLOY</div>
+
+        <div id="auth-form">
+            <h2 id="form-title" style="margin-bottom: 30px;">Créer un compte</h2>
+            
+            <div class="form-group" id="group-username">
+                <label>Nom d'utilisateur</label>
+                <input type="text" id="in-username" placeholder="Comment t'appelles-tu ?">
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="in-email" placeholder="ton@email.com">
+            </div>
+
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" id="in-password" placeholder="••••••••">
+            </div>
+
+            <button class="btn-main" id="btn-submit">DÉMARRER L'EXPÉRIENCE</button>
+            
+            <div id="error-msg"></div>
+
+            <span class="toggle-link" id="toggle-mode">Déjà inscrit ? <span>Se connecter</span></span>
+        </div>
     </div>
 
     <script type="module">
+        import { AuthController } from './auth-controller.js';
         import { auth } from './firebase-config.js';
-        import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        document.getElementById('loginBtn').onclick = async () => {
-            const e = document.getElementById('email').value;
-            const p = document.getElementById('pass').value;
-            try {
-                await signInWithEmailAndPassword(auth, e, p);
+        const btn = document.getElementById('btn-submit');
+        const modeBtn = document.getElementById('toggle-mode');
+        const title = document.getElementById('form-title');
+        const userGroup = document.getElementById('group-username');
+        const errorDiv = document.getElementById('error-msg');
+
+        let isLogin = false; // Par défaut : Inscription
+
+        modeBtn.onclick = () => {
+            isLogin = !isLogin;
+            title.innerText = isLogin ? "Connexion" : "Créer un compte";
+            userGroup.style.display = isLogin ? "none" : "block";
+            btn.innerText = isLogin ? "SE CONNECTER" : "DÉMARRER L'EXPÉRIENCE";
+            modeBtn.innerHTML = isLogin ? "Nouveau ici ? <span>Créer un compte</span>" : "Déjà inscrit ? <span>Se connecter</span>";
+        };
+
+        btn.onclick = async () => {
+            const email = document.getElementById('in-email').value.trim();
+            const pass = document.getElementById('in-password').value.trim();
+            const user = document.getElementById('in-username').value.trim();
+
+            errorDiv.style.display = "none";
+            btn.disabled = true;
+            btn.innerText = "PATIENTEZ...";
+
+            let result;
+            if (isLogin) {
+                result = await AuthController.login(email, pass);
+            } else {
+                if(!user) {
+                    showError("Le nom d'utilisateur est requis.");
+                    return;
+                }
+                result = await AuthController.register(email, pass, user);
+            }
+
+            if (result.success) {
                 window.location.href = "index.html";
-            } catch (err) { 
-                document.getElementById('err').innerText = "Erreur de connexion";
-                document.getElementById('err').style.display = "block";
+            } else {
+                showError(result.error);
             }
         };
+
+        function showError(msg) {
+            errorDiv.innerText = msg;
+            errorDiv.style.display = "block";
+            btn.disabled = false;
+            btn.innerText = isLogin ? "SE CONNECTER" : "DÉMARRER L'EXPÉRIENCE";
+        }
     </script>
 </body>
 </html>
