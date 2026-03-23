@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Menu | Floy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --f-bg: #000000;
+            --f-accent: #FF7A1A;
+            --f-card: #121212;
+            --f-text: #ffffff;
+            --f-dim: #8e8e8e;
+            --f-border: #262626;
+            --f-danger: #ff3b30;
+        }
+
+        body { 
+            background: var(--f-bg); color: var(--f-text); 
+            font-family: -apple-system, sans-serif; margin: 0; padding: 0; 
+        }
+
+        header {
+            padding: 20px; display: flex; align-items: center; gap: 15px;
+            border-bottom: 1px solid var(--f-border);
+        }
+        .back-btn { font-size: 22px; color: var(--f-accent); cursor: pointer; }
+
+        /* --- PROFIL SECTION --- */
+        .profile-hero {
+            padding: 30px 20px; text-align: center;
+            background: linear-gradient(to bottom, #111, #000);
+        }
+        .menu-avatar {
+            width: 100px; height: 100px; border-radius: 50%;
+            border: 3px solid var(--f-accent); margin-bottom: 15px;
+            object-fit: cover;
+        }
+        .user-name { font-size: 22px; font-weight: 800; display: block; }
+        .user-status { color: var(--f-dim); font-size: 14px; margin-top: 5px; }
+
+        /* --- LISTE DES OPTIONS --- */
+        .menu-list { padding: 10px; }
+        .menu-item {
+            display: flex; align-items: center; gap: 15px;
+            padding: 18px; border-radius: 12px;
+            margin-bottom: 5px; cursor: pointer;
+            transition: 0.2s;
+        }
+        .menu-item:active { background: #1a1a1a; }
+        .menu-item i { font-size: 20px; width: 30px; color: var(--f-accent); }
+        .menu-item span { font-size: 16px; font-weight: 500; flex: 1; }
+        .menu-item .chevron { color: #333; font-size: 14px; }
+
+        .logout { color: var(--f-danger); margin-top: 20px; }
+        .logout i { color: var(--f-danger); }
+
+        .footer-logo {
+            text-align: center; margin-top: 40px; padding-bottom: 30px;
+            opacity: 0.3; font-weight: 900; letter-spacing: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <i class="fas fa-times back-btn" onclick="window.history.back()"></i>
+        <span style="font-weight: bold; font-size: 18px;">Menu</span>
+    </header>
+
+    <div class="profile-hero">
+        <img id="user-img" src="https://via.placeholder.com/100" class="menu-avatar">
+        <span class="user-name" id="user-name">Chargement...</span>
+        <span class="user-status">Membre Officiel Floy</span>
+    </div>
+
+    <div class="menu-list">
+        <div class="menu-item" onclick="window.location.href='profile-edit.html'">
+            <i class="fas fa-user-circle"></i>
+            <span>Mon Profil</span>
+            <i class="fas fa-chevron-right chevron"></i>
+        </div>
+
+        <div class="menu-item">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+            <i class="fas fa-chevron-right chevron"></i>
+        </div>
+
+        <div class="menu-item">
+            <i class="fas fa-shield-alt"></i>
+            <span>Sécurité & Confidentialité</span>
+            <i class="fas fa-chevron-right chevron"></i>
+        </div>
+
+        <div class="menu-item">
+            <i class="fas fa-question-circle"></i>
+            <span>Aide & Support</span>
+            <i class="fas fa-chevron-right chevron"></i>
+        </div>
+
+        <div class="menu-item logout" id="btn-logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Déconnexion</span>
+        </div>
+    </div>
+
+    <div class="footer-logo">FLOY</div>
+
+    <script type="module">
+        import { db, auth } from './firebase-config.js';
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = "auth.html";
+            } else {
+                // Charger les infos depuis la collection Utilisateurs (U majuscule)
+                const snap = await getDoc(doc(db, "Utilisateurs", user.uid));
+                if (snap.exists()) {
+                    document.getElementById('user-name').innerText = snap.data().username;
+                    document.getElementById('user-img').src = snap.data().avatarUrl || 'https://via.placeholder.com/100';
+                }
+            }
+        });
+
+        // Logique de déconnexion
+        document.getElementById('btn-logout').onclick = () => {
+            if(confirm("Voulez-vous vraiment vous déconnecter de Floy ?")) {
+                signOut(auth).then(() => {
+                    window.location.href = "auth.html";
+                });
+            }
+        };
+    </script>
+</body>
+</html>
