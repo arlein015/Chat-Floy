@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Discussion | Floy</title>
+    <title>Floy Chat | Secure Messenger</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* --- CONFIGURATION DES COULEURS FLOY --- */
         :root {
             --f-bg: #000000;
             --f-accent: #FF7A1A;
@@ -14,136 +15,270 @@
             --f-text-me: #000000;
             --f-text-them: #ffffff;
             --f-dim: #636366;
+            --f-header-bg: rgba(0, 0, 0, 0.85);
         }
 
-        body { background: var(--f-bg); color: #fff; font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background: var(--f-bg); 
+            color: #fff; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
 
         /* --- HEADER --- */
         header {
-            padding: 10px 15px; border-bottom: 1px solid #222; display: flex; align-items: center; gap: 12px;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 10;
+            padding: 12px 15px;
+            background: var(--f-header-bg);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #1a1a1a;
+            z-index: 100;
         }
-        .back-btn { color: var(--f-accent); font-size: 18px; cursor: pointer; padding: 5px; }
-        #chat-user-name { font-weight: 700; font-size: 16px; letter-spacing: 0.5px; }
 
-        /* --- ZONE DE CHAT --- */
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn { color: var(--f-accent); font-size: 20px; cursor: pointer; padding: 5px; }
+        
+        .user-info-header { display: flex; align-items: center; gap: 10px; }
+        .user-info-header img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid #333; }
+        .user-info-header span { font-weight: 700; font-size: 16px; }
+
+        /* --- ZONE DE MESSAGES --- */
         #chat-window {
-            flex: 1; overflow-y: auto; padding: 15px;
-            display: flex; flex-direction: column; gap: 15px;
-            background: #000;
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scroll-behavior: smooth;
         }
 
-        /* --- STRUCTURE DU MESSAGE --- */
-        .msg-container { display: flex; flex-direction: column; max-width: 75%; }
-        .msg-container.me { align-self: flex-end; align-items: flex-end; }
-        .msg-container.them { align-self: flex-start; align-items: flex-start; }
+        /* --- STYLES DES BULLES --- */
+        .msg-group { display: flex; flex-direction: column; max-width: 80%; position: relative; }
+        .msg-group.me { align-self: flex-end; align-items: flex-end; }
+        .msg-group.them { align-self: flex-start; align-items: flex-start; }
 
         .bubble {
-            padding: 10px 14px; border-radius: 18px;
-            font-size: 15px; line-height: 1.4; word-wrap: break-word;
-        }
-        .me .bubble { background: var(--f-bubble-me); color: var(--f-text-me); border-bottom-right-radius: 4px; font-weight: 500; }
-        .them .bubble { background: var(--f-bubble-them); color: var(--f-text-them); border-bottom-left-radius: 4px; }
-
-        /* --- L'HEURE --- */
-        .timestamp {
-            font-size: 10px; color: var(--f-dim); margin-top: 4px; font-weight: 500;
-            text-transform: uppercase;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-size: 15px;
+            line-height: 1.45;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
 
-        /* --- BARRE D'ENVOI --- */
-        footer {
-            padding: 10px 15px 30px 15px; background: #000;
-            border-top: 1px solid #1a1a1a; display: flex; gap: 10px; align-items: center;
+        .me .bubble {
+            background: var(--f-bubble-me);
+            color: var(--f-text-me);
+            border-bottom-right-radius: 4px;
         }
+
+        .them .bubble {
+            background: var(--f-bubble-them);
+            color: var(--f-text-them);
+            border-bottom-left-radius: 4px;
+        }
+
+        /* --- META DATA (Heure + Statut) --- */
+        .msg-meta {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 4px;
+            font-size: 10px;
+            color: var(--f-dim);
+            font-weight: 600;
+        }
+
+        .status-icon { font-size: 12px; }
+        .status-read { color: var(--f-accent); }
+
+        /* --- BARRE D'ENTRÉE --- */
+        .chat-footer {
+            padding: 10px 15px 35px 15px;
+            background: #000;
+            border-top: 1px solid #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            background: #121212;
+            border-radius: 25px;
+            padding: 4px 15px;
+            display: flex;
+            align-items: center;
+            border: 1px solid #222;
+        }
+
         #msg-input {
-            flex: 1; background: #121212; border: 1px solid #222;
-            padding: 12px 18px; border-radius: 25px; color: #fff; outline: none; font-size: 15px;
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            padding: 10px 0;
+            font-size: 15px;
+            outline: none;
         }
-        #msg-input:focus { border-color: var(--f-accent); }
-        .send-btn {
-            background: var(--f-accent); border: none; width: 42px; height: 42px;
-            border-radius: 50%; color: #000; cursor: pointer; font-size: 16px;
-            display: flex; align-items: center; justify-content: center;
+
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: var(--f-accent);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+            transition: transform 0.1s;
         }
+
+        .action-btn:active { transform: scale(0.9); }
+
+        .send-btn-main {
+            background: var(--f-accent);
+            color: #000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Animation de nouveau message */
+        @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .msg-group { animation: pop 0.2s ease-out; }
+
     </style>
 </head>
 <body>
 
     <header>
-        <i class="fas fa-chevron-left back-btn" onclick="window.location.href='index.html'"></i>
-        <span id="chat-user-name">...</span>
+        <div class="header-left">
+            <i class="fas fa-chevron-left back-btn" onclick="window.location.href='index.html'"></i>
+            <div class="user-info-header">
+                <img id="target-avatar" src="https://via.placeholder.com/40">
+                <span id="target-name">Chargement...</span>
+            </div>
+        </div>
+        <i class="fas fa-ellipsis-v" style="color: #444;"></i>
     </header>
 
     <main id="chat-window"></main>
 
-    <footer>
-        <input type="text" id="msg-input" placeholder="Message Floy..." autocomplete="off">
-        <button class="send-btn" id="send-btn"><i class="fas fa-paper-plane"></i></button>
-    </footer>
+    <div class="chat-footer">
+        <button class="action-btn"><i class="fas fa-plus"></i></button>
+        <div class="input-wrapper">
+            <input type="text" id="msg-input" placeholder="Message Floy..." autocomplete="off">
+            <i class="far fa-smile" style="color: var(--f-dim); font-size: 20px;"></i>
+        </div>
+        <button class="send-btn-main" id="send-btn">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
 
     <script type="module">
         import { db, auth } from './firebase-config.js';
-        import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { 
+            collection, addDoc, query, orderBy, onSnapshot, 
+            serverTimestamp, doc, getDoc, updateDoc, setDoc 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const win = document.getElementById('chat-window');
         const input = document.getElementById('msg-input');
         const btn = document.getElementById('send-btn');
-        const nameDisplay = document.getElementById('chat-user-name');
+        const nameDisplay = document.getElementById('target-name');
+        const avatarDisplay = document.getElementById('target-avatar');
         
         const params = new URLSearchParams(window.location.search);
         const targetId = params.get('id');
 
-        // Fonction pour formater l'heure (ex: 14:30)
-        function formatTime(timestamp) {
-            if(!timestamp) return "...";
-            const date = timestamp.toDate();
-            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        // FORMATEUR D'HEURE PRO
+        function formatTime(ts) {
+            if(!ts) return "Envoi...";
+            const d = ts.toDate();
+            return d.getHours().toString().padStart(2, '0') + ":" + d.getMinutes().toString().padStart(2, '0');
         }
 
         auth.onAuthStateChanged(async (user) => {
-            if(!user) window.location.href = "auth.html";
-            if(!targetId) window.location.href = "index.html";
+            if(!user || !targetId) {
+                window.location.href = "index.html";
+                return;
+            }
 
-            // Charger le nom de l'autre depuis ta collection "Utilisateurs"
-            const snap = await getDoc(doc(db, "Utilisateurs", targetId));
-            if(snap.exists()) nameDisplay.innerText = snap.data().username;
+            // RECUPERER INFOS DU DESTINATAIRE (Utilisateurs avec U majuscule comme dans ta console)
+            const userSnap = await getDoc(doc(db, "Utilisateurs", targetId));
+            if(userSnap.exists()) {
+                nameDisplay.innerText = userSnap.data().username;
+                avatarDisplay.src = userSnap.data().avatarUrl || 'https://via.placeholder.com/40';
+            }
 
+            // GENERER ROOM ID UNIQUE
             const roomId = [user.uid, targetId].sort().join("_");
 
+            // ECOUTER LES MESSAGES
             const q = query(collection(db, "chats", roomId, "messages"), orderBy("timestamp", "asc"));
+            
             onSnapshot(q, (snap) => {
                 win.innerHTML = "";
                 snap.forEach(d => {
                     const m = d.data();
                     const isMe = m.senderId === user.uid;
                     
-                    const container = document.createElement('div');
-                    container.className = `msg-container ${isMe ? 'me' : 'them'}`;
+                    const group = document.createElement('div');
+                    group.className = `msg-group ${isMe ? 'me' : 'them'}`;
                     
-                    container.innerHTML = `
+                    // Statut du message (Lu/Non lu)
+                    const statusIcon = isMe ? `<i class="fas fa-check-double status-icon ${m.read ? 'status-read' : ''}"></i>` : '';
+
+                    group.innerHTML = `
                         <div class="bubble">${m.text}</div>
-                        <div class="timestamp">${formatTime(m.timestamp)}</div>
+                        <div class="msg-meta">
+                            ${formatTime(m.timestamp)} ${statusIcon}
+                        </div>
                     `;
-                    
-                    win.appendChild(container);
+                    win.appendChild(group);
+
+                    // Marquer comme lu si c'est un message reçu
+                    if(!isMe && !m.read) {
+                        updateDoc(doc(db, "chats", roomId, "messages", d.id), { read: true });
+                    }
                 });
                 win.scrollTop = win.scrollHeight;
             });
 
-            const send = async () => {
-                if(!input.value.trim()) return;
-                const text = input.value;
+            // ENVOYER MESSAGE
+            const sendMessage = async () => {
+                const text = input.value.trim();
+                if(!text) return;
+                
                 input.value = "";
-                await addDoc(collection(db, "chats", roomId, "messages"), {
-                    senderId: user.uid,
-                    text: text,
-                    timestamp: serverTimestamp()
-                });
+                try {
+                    await addDoc(collection(db, "chats", roomId, "messages"), {
+                        senderId: user.uid,
+                        text: text,
+                        timestamp: serverTimestamp(),
+                        read: false
+                    });
+                } catch (err) {
+                    console.error("Erreur d'envoi:", err);
+                }
             };
 
-            btn.onclick = send;
-            input.onkeypress = (e) => { if(e.key === "Enter") send(); };
+            btn.onclick = sendMessage;
+            input.onkeypress = (e) => { if(e.key === "Enter") sendMessage(); };
         });
     </script>
 </body>
