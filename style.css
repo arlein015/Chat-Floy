@@ -1,159 +1,49 @@
-/* Variables de couleurs Floy */
+/* style.css */
 :root {
     --floy-orange: #FF7920;
     --floy-black: #000000;
-    --floy-dark-grey: #121212;
-    --floy-medium-grey: #1E1E1E;
-    --floy-text-white: #FFFFFF;
-    --floy-text-dim: #A0A0A0;
+    --floy-dark: #121212;
+    --floy-grey: #1E1E1E;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Roboto, sans-serif;
-}
-
-body {
+body, html {
+    margin: 0; padding: 0; height: 100%;
     background-color: var(--floy-black);
-    color: var(--floy-text-white);
-    height: 100vh;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
     overflow: hidden;
 }
 
-/* Container principal */
-.floy-container {
-    display: flex;
-    height: 100vh;
+.app-container { display: flex; height: 100vh; }
+
+/* Barre Latérale */
+.sidebar {
+    width: 80px; background: var(--floy-black);
+    border-right: 1px solid var(--floy-grey);
+    display: flex; flex-direction: column; align-items: center; padding-top: 20px;
 }
 
-/* 1. BARRE LATÉRALE (Nav) */
-.side-menu {
-    width: 70px;
-    background-color: var(--floy-black);
-    border-right: 1px solid var(--floy-medium-grey);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px 0;
-    gap: 30px;
+.logo-f { color: var(--floy-orange); font-size: 30px; font-weight: 900; margin-bottom: 30px; }
+
+/* Zone Chat */
+.chat-main { flex: 1; display: flex; flex-direction: column; }
+
+#messages-container {
+    flex: 1; padding: 20px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 10px;
 }
 
-.side-menu .logo {
-    color: var(--floy-orange);
-    font-weight: bold;
-    font-size: 24px;
-    margin-bottom: 20px;
+.message { padding: 12px 16px; border-radius: 15px; max-width: 70%; }
+.sent { align-self: flex-end; background: var(--floy-orange); color: black; font-weight: bold; }
+.received { align-self: flex-start; background: var(--floy-grey); color: white; }
+
+/* Saisie */
+.input-area { padding: 20px; display: flex; gap: 10px; border-top: 1px solid var(--floy-grey); }
+input { 
+    flex: 1; background: var(--floy-dark); border: 1px solid var(--floy-grey);
+    padding: 15px; border-radius: 25px; color: white; outline: none;
 }
-
-.side-menu i {
-    font-size: 24px;
-    color: var(--floy-text-dim);
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.side-menu i.active, .side-menu i:hover {
-    color: var(--floy-orange);
-}
-
-/* 2. LISTE DES CONVERSATIONS */
-.chat-list {
-    width: 350px;
-    background-color: var(--floy-dark-grey);
-    border-right: 1px solid var(--floy-medium-grey);
-    display: flex;
-    flex-direction: column;
-}
-
-.chat-list header {
-    padding: 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.chat-list h2 { font-size: 20px; }
-
-.search-bar {
-    padding: 0 20px 20px;
-}
-
-.search-bar input {
-    width: 100%;
-    background: var(--floy-medium-grey);
-    border: none;
-    padding: 12px;
-    border-radius: 10px;
-    color: white;
-    outline: none;
-}
-
-/* 3. ZONE DE MESSAGE */
-.chat-window {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background-color: var(--floy-black);
-}
-
-.chat-header {
-    padding: 20px;
-    border-bottom: 1px solid var(--floy-medium-grey);
-    display: flex;
-    justify-content: space-between;
-}
-
-.status-dot.online {
-    width: 10px;
-    height: 10px;
-    background-color: #2ecc71;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 10px;
-}
-
-.messages-display {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-/* ZONE DE SAISIE */
-.chat-input-area {
-    padding: 20px;
-    background: var(--floy-dark-grey);
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.chat-input-area input {
-    flex: 1;
-    background: var(--floy-medium-grey);
-    border: 1px solid #333;
-    padding: 15px;
-    border-radius: 25px;
-    color: white;
-    outline: none;
-}
-
-.chat-input-area button {
-    background: var(--floy-orange);
-    border: none;
-    color: black; /* Texte noir sur bouton orange comme ton image */
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    font-size: 20px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.chat-input-area button:hover {
-    transform: scale(1.05);
+.send-btn { 
+    background: var(--floy-orange); border: none; width: 50px; height: 50px;
+    border-radius: 50%; cursor: pointer; font-size: 20px;
 }
