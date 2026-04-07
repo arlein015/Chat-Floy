@@ -2,18 +2,33 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Floy Chat Orange</title>
+    <title>Floy | Design</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="chat-box">
-        <h1>FLOY CHAT</h1>
-        <div id="display" style="margin-bottom: 20px; color: white;">Bienvenue...</div>
-        <input type="text" id="msg" placeholder="Discutez ici...">
-        <button id="btn">Envoyer</button>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo">F</div>
+            <div class="icon active">💬</div>
+            <div class="icon">👤</div>
+        </aside>
+
+        <main class="chat-area">
+            <header class="chat-header">
+                <h2>FLOY CHAT</h2>
+            </header>
+
+            <div id="messages-container">
+                <div class="msg received">Bienvenue sur Floy. Design en cours...</div>
+            </div>
+
+            <div class="input-bar">
+                <input type="text" id="user-input" placeholder="Discutez ici...">
+                <button id="send-btn">Envoyer</button>
+            </div>
+        </main>
     </div>
 
-    <script src="message-engine.js"></script>
 </body>
 </html>
