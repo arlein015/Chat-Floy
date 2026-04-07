@@ -4,14 +4,14 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey: "METS_TA_CLE_ICI_SANS_ESPACES", 
-    authDomain: "VOTRE_PROJET.firebaseapp.com",
-    projectId: "VOTRE_PROJET_ID",
-    storageBucket: "VOTRE_PROJET.appspot.com",
-    messagingSenderId: "XXXXX",
-    appId: "XXXXX"
+  apiKey: "AIzaSyD264JpNWs08p7exXOLRZdWUkbKBdviw8c",
+  authDomain: "floy-9f9a1.firebaseapp.com",
+  projectId: "floy-9f9a1",
+  storageBucket: "floy-9f9a1.firebasestorage.app",
+  messagingSenderId: "401063236997",
+  appId: "1:401063236997:web:ba53cf61961acd977b20ec",
+  measurementId: "G-YSGGQ4Q4TV"
 };
-
 // Initialisation
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
