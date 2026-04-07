@@ -2,183 +2,111 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Connexion | Chat Floy</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --f-bg: #000000;
-            --f-surface: #121212;
-            --f-accent: #FF7A1A; /* Ton orange Floy */
-            --f-text: #ffffff;
-            --f-dim: #a8a8a8;
-            --f-error: #ff4d4d;
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floy | Connexion</title>
+    <link rel="stylesheet" href="style.css"> <style>
+        .auth-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #000000;
         }
-
-        * { box-sizing: border-box; font-family: -apple-system, system-ui, sans-serif; }
-        body { background: var(--f-bg); color: var(--f-text); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-
-        /* --- CONTAINER PRINCIPAL --- */
+        .logo-text {
+            color: #FF7920;
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: 5px;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
         .auth-card {
-            width: 100%; max-width: 400px; padding: 40px 20px;
-            text-align: center; animation: slideUp 0.6s ease-out;
+            width: 100%;
+            max-width: 350px;
+            padding: 20px;
+            text-align: center;
         }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .logo-floy {
-            font-size: 45px; font-weight: 900; letter-spacing: 8px;
-            color: var(--f-accent); margin-bottom: 10px;
-            text-shadow: 0 0 15px rgba(255, 122, 26, 0.3);
+        h2 { margin-bottom: 30px; font-weight: 600; }
+        .input-group {
+            text-align: left;
+            margin-bottom: 20px;
         }
-
-        .auth-subtitle { color: var(--f-dim); font-size: 14px; margin-bottom: 40px; }
-
-        /* --- FORMULAIRE --- */
-        .form-group { position: relative; margin-bottom: 20px; }
-        
-        .f-input {
-            width: 100%; background: var(--f-surface); border: 1px solid #262626;
-            padding: 14px 15px; border-radius: 12px; color: white;
-            font-size: 15px; transition: 0.3s;
+        label {
+            display: block;
+            color: #A0A0A0;
+            font-size: 12px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: bold;
         }
-        .f-input:focus { border-color: var(--f-accent); outline: none; background: #1a1a1a; }
-
-        .btn-auth {
-            width: 100%; background: var(--f-accent); color: #000;
-            border: none; padding: 14px; border-radius: 12px;
-            font-size: 16px; font-weight: 700; cursor: pointer;
-            margin-top: 10px; transition: 0.2s;
+        input {
+            width: 100%;
+            background: #121212;
+            border: 1px solid #1E1E1E;
+            padding: 15px;
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
         }
-        .btn-auth:active { transform: scale(0.98); opacity: 0.9; }
-
-        /* --- SWITCH LOGIN/SIGNUP --- */
-        .switch-mode { margin-top: 25px; font-size: 14px; color: var(--f-dim); }
-        .switch-link { color: var(--f-accent); cursor: pointer; font-weight: 600; text-decoration: none; }
-
-        /* --- ETAT DE CHARGEMENT --- */
-        .loader {
-            display: none; width: 20px; height: 20px; border: 3px solid #000;
-            border-top: 3px solid transparent; border-radius: 50%;
-            animation: spin 0.8s linear infinite; margin: 0 auto;
+        input:focus { border-color: #FF7920; }
+        .btn-primary {
+            width: 100%;
+            background: #FF7920;
+            color: #000000;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            text-transform: uppercase;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        #error-msg { color: var(--f-error); font-size: 13px; margin-top: 15px; display: none; }
+        .error-msg {
+            color: #ff4d4d;
+            font-size: 13px;
+            margin-top: 15px;
+            display: none; /* Caché par défaut */
+        }
+        .link-footer {
+            margin-top: 30px;
+            color: #A0A0A0;
+            font-size: 14px;
+        }
+        .link-footer a { color: #FF7920; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="auth-card">
-        <div class="logo-floy">FLOY</div>
-        <p class="auth-subtitle" id="auth-title">Connectez-vous pour continuer sur Chat Floy</p>
+    <div class="auth-container">
+        <div class="logo-text">FLOY</div>
+        
+        <div class="auth-card">
+            <h2>Se connecter</h2>
 
-        <div id="login-form">
-            <div class="form-group">
-                <input type="email" id="email" class="f-input" placeholder="Email">
-            </div>
-            
-            <div class="form-group" id="username-group" style="display: none;">
-                <input type="text" id="username" class="f-input" placeholder="Nom d'utilisateur">
-            </div>
+            <form id="login-form">
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="ton@email.com" required>
+                </div>
 
-            <div class="form-group">
-                <input type="password" id="password" class="f-input" placeholder="Mot de passe">
-            </div>
+                <div class="input-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
 
-            <button id="main-btn" class="btn-auth">
-                <span id="btn-text">Se connecter</span>
-                <div class="loader" id="btn-loader"></div>
-            </button>
-            
-            <p id="error-msg">Erreur de connexion</p>
+                <button type="submit" class="btn-primary" id="login-btn">Connexion</button>
+                <div id="error-display" class="error-msg"></div>
+            </form>
 
-            <div class="switch-mode">
-                <span id="switch-text">Pas encore de compte ?</span>
-                <span class="switch-link" id="toggle-auth">S'inscrire</span>
+            <div class="link-footer">
+                Pas encore de compte ? <a href="signin.html">S'inscrire</a>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        import { auth, db } from './firebase-config.js';
-        import { 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword 
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        let isLogin = true;
-        const mainBtn = document.getElementById('main-btn');
-        const toggleLink = document.getElementById('toggle-auth');
-        const errorMsg = document.getElementById('error-msg');
-
-        // Basculer entre Connexion et Inscription
-        toggleLink.onclick = () => {
-            isLogin = !isLogin;
-            document.getElementById('username-group').style.display = isLogin ? 'none' : 'block';
-            document.getElementById('auth-title').innerText = isLogin ? 'Connectez-vous pour continuer' : 'Créez votre compte Floy';
-            document.getElementById('btn-text').innerText = isLogin ? 'Se connecter' : 'Créer mon compte';
-            document.getElementById('switch-text').innerText = isLogin ? 'Pas encore de compte ?' : 'Déjà inscrit ?';
-            toggleLink.innerText = isLogin ? 'S\'inscrire' : 'Se connecter';
-        };
-
-        // Gérer l'authentification
-        mainBtn.onclick = async () => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const username = document.getElementById('username').value;
-
-            if(!email || !password) return showErr("Remplissez tous les champs.");
-            
-            setLoading(true);
-            errorMsg.style.display = 'none';
-
-            try {
-                if (isLogin) {
-                    // CONNEXION
-                    await signInWithEmailAndPassword(auth, email, password);
-                    window.location.href = "index.html";
-                } else {
-                    // INSCRIPTION
-                    if(!username) return showErr("Choisissez un pseudo.");
-                    const res = await createUserWithEmailAndPassword(auth, email, password);
-                    
-                    // Créer le profil dans Firestore avec tes paramètres Floy
-                    await setDoc(doc(db, "users", res.user.uid), {
-                        username: username,
-                        email: email,
-                        avatarUrl: "",
-                        isOnline: true,
-                        isVerified: false, // Badge orange par défaut à false
-                        createdAt: serverTimestamp()
-                    });
-                    window.location.href = "index.html";
-                }
-            } catch (err) {
-                showErr("Identifiants incorrects ou compte déjà existant.");
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        function showErr(txt) {
-            errorMsg.innerText = txt;
-            errorMsg.style.display = 'block';
-        }
-
-        function setLoading(state) {
-            document.getElementById('btn-text').style.display = state ? 'none' : 'block';
-            document.getElementById('btn-loader').style.display = state ? 'block' : 'none';
-            mainBtn.disabled = state;
-        }
-
-        // Redirection automatique si déjà connecté
-        auth.onAuthStateChanged(user => {
-            if(user) window.location.href = "index.html";
-        });
-    </script>
+    <script type="module" src="auth-controller.js"></script>
 </body>
 </html>
