@@ -1,40 +1,166 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Floy - Connexion</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floy | Bienvenue</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }
-        #messages { list-style-type: none; width: 100%; max-width: 400px; padding: 0; }
-        #messages li { padding: 8px; border-bottom: 1px solid #eee; }
-        #form { display: flex; width: 100%; max-width: 400px; }
+        :root {
+            --floy-orange: #FF7920;
+            --floy-black: #000000;
+            --floy-input-bg: #121212;
+            --floy-input-border: #1E1E1E;
+            --floy-text-gray: #A0A0A0;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: var(--floy-black);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 380px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Le Logo Orange de ta capture */
+        .logo {
+            color: var(--floy-orange);
+            font-size: 52px;
+            font-weight: 900;
+            letter-spacing: 6px;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 35px;
+        }
+
+        /* Style des champs de saisie */
+        .input-group {
+            text-align: left;
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            color: var(--floy-text-gray);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            background-color: var(--floy-input-bg);
+            border: 1px solid var(--floy-input-border);
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--floy-orange);
+        }
+
+        /* Le bouton Orange Flamboyant */
+        .btn-login {
+            width: 100%;
+            background-color: var(--floy-orange);
+            color: var(--floy-black);
+            border: none;
+            border-radius: 15px;
+            padding: 18px;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-top: 15px;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .btn-login:active {
+            transform: scale(0.98);
+        }
+
+        /* Message d'erreur Firebase (en rouge sous le bouton) */
+        #error-message {
+            color: #ff4d4d;
+            font-size: 12px;
+            margin-top: 15px;
+            line-height: 1.4;
+            display: none; /* Masqué par défaut */
+        }
+
+        /* Lien vers l'inscription */
+        .footer-link {
+            margin-top: 35px;
+            font-size: 14px;
+            color: var(--floy-text-gray);
+        }
+
+        .footer-link a {
+            color: var(--floy-orange);
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
-    <h1>Bienvenue sur Floy</h1>
-    <ul id="messages"></ul>
-    <form id="form" action="">
-        <input id="input" autocomplete="off" placeholder="Discutez ici..." /><button>Envoyer</button>
-    </form>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        var socket = io();
-        var form = document.getElementById('form');
-        var input = document.getElementById('input');
+    <div class="login-container">
+        <div class="logo">FLOY</div>
+        
+        <h2>Créer un compte</h2>
 
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (input.value) {
-                socket.emit('chat message', input.value);
-                input.value = '';
-            }
-        });
+        <form id="auth-form">
+            <div class="input-group">
+                <label>Nom d'utilisateur</label>
+                <input type="text" id="username" placeholder="Pseudo" required>
+            </div>
 
-        socket.on('chat message', function(msg) {
-            var item = document.createElement('li');
-            item.textContent = msg;
-            document.getElementById('messages').appendChild(item);
-        });
-    </script>
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" id="email" placeholder="ton@email.com" required>
+            </div>
+
+            <div class="input-group">
+                <label>Mot de passe</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn-login" id="submit-btn">Démarrer l'expérience</button>
+            
+            <div id="error-message"></div>
+        </form>
+
+        <div class="footer-link">
+            Déjà inscrit ? <a href="login.html">Se connecter</a>
+        </div>
+    </div>
+
+    <script type="module" src="auth-controller.js"></script>
+
 </body>
 </html>
