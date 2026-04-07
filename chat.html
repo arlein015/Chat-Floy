@@ -2,35 +2,18 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>TEST FLOY ORANGE</title>
-    <style>
-        /* SI TU VOIS DU NOIR ET DU ORANGE, CA MARCHE */
-        body { 
-            background-color: #000000 !important; 
-            color: #FF7920 !important; 
-            display: flex; 
-            flex-direction: column;
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-        .box {
-            border: 2px solid #FF7920;
-            padding: 50px;
-            border-radius: 20px;
-            text-align: center;
-        }
-        h1 { font-size: 50px; text-transform: uppercase; letter-spacing: 5px; }
-        p { color: white; }
-    </style>
+    <title>Floy Chat Orange</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="box">
-        <h1>FLOY</h1>
-        <p>Si tu vois ce message en ORANGE sur fond NOIR,</p>
-        <p>alors nous avons enfin le contrôle !</p>
+
+    <div class="chat-box">
+        <h1>FLOY CHAT</h1>
+        <div id="display" style="margin-bottom: 20px; color: white;">Bienvenue...</div>
+        <input type="text" id="msg" placeholder="Discutez ici...">
+        <button id="btn">Envoyer</button>
     </div>
+
+    <script src="message-engine.js"></script>
 </body>
 </html>
