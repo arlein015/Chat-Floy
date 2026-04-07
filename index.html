@@ -2,29 +2,18 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Floy | Chargement...</title>
+    <title>Floy | Chargement</title>
     <style>
-        body { 
-            background-color: #000000; 
-            color: #FF7920; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            font-family: sans-serif; 
-            margin: 0;
-        }
+        body { background: #000; color: #FF7920; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; }
     </style>
 </head>
 <body>
-    <h1 id="status">LANCEMENT DE FLOY...</h1>
+    <h1>LANCEMENT DE FLOY...</h1>
 
     <script>
-        // On attend 1 seconde et on force la direction vers le chat
-        setTimeout(() => {
-            document.getElementById('status').innerText = "OUVERTURE DU CHAT...";
-            window.location.href = "chat.html";
-        }, 1200);
+        // On force la redirection vers le chat sans passer par aucune vérification
+        console.log("Bypass Auth - Direction Chat");
+        window.location.href = "chat.html";
     </script>
 </body>
 </html>
