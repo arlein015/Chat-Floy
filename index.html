@@ -1,222 +1,40 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Floy | Connecté</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
+    <title>Floy - Connexion</title>
     <style>
-        :root {
-            --f-bg: #000000;
-            --f-accent: #FF7A1A;
-            --f-card: #121212;
-            --f-text: #ffffff;
-            --f-text-dim: #8e8e8e;
-            --f-border: #1c1c1e;
-            --f-success: #34c759;
-            --safe-top: env(safe-area-inset-top);
-            --safe-bottom: env(safe-area-inset-bottom);
-        }
-
-        body { 
-            background: var(--f-bg); 
-            color: var(--f-text); 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            margin: 0; padding: 0; 
-            overflow-x: hidden;
-        }
-
-        /* --- LOADER --- */
-        #floy-engine-loader {
-            position: fixed; inset: 0; background: var(--f-bg);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 10000; transition: opacity 0.6s ease;
-        }
-        .loader-ring {
-            width: 60px; height: 60px;
-            border: 4px solid rgba(255, 122, 26, 0.1);
-            border-top: 4px solid var(--f-accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* --- HEADER --- */
-        header {
-            position: sticky; top: 0; z-index: 900;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
-            padding: calc(15px + var(--safe-top)) 20px 15px;
-            display: flex; align-items: center; justify-content: space-between;
-            border-bottom: 1px solid var(--f-border);
-        }
-        .logo { font-size: 22px; font-weight: 800; color: var(--f-accent); letter-spacing: 4px; }
-        .user-pic { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--f-accent); object-fit: cover; }
-
-        /* --- STORIES & NOTES --- */
-        .stories-wrapper { padding: 20px 0; border-bottom: 1px solid var(--f-border); }
-        .stories-scroll { display: flex; gap: 18px; overflow-x: auto; padding: 0 20px; scrollbar-width: none; }
-        
-        .story-node { position: relative; display: flex; flex-direction: column; align-items: center; min-width: 75px; cursor: pointer; }
-        .note-bubble {
-            position: absolute; top: -8px; right: -5px;
-            background: var(--f-card); color: var(--f-accent);
-            border: 1.5px solid var(--f-accent); border-radius: 12px;
-            padding: 3px 8px; font-size: 10px; font-weight: 800;
-            z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-        .avatar-ring { width: 68px; height: 68px; border-radius: 50%; padding: 3px; border: 2.5px solid var(--f-accent); }
-        .avatar-ring img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-        .online-dot { position: absolute; bottom: 22px; right: 8px; width: 12px; height: 12px; background: var(--f-success); border: 2px solid #000; border-radius: 50%; }
-
-        /* --- CHAT LIST --- */
-        .chat-card { display: flex; align-items: center; gap: 15px; padding: 15px 20px; border-bottom: 0.5px solid #111; }
-        .chat-info { flex: 1; }
-        .chat-name { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
-        .chat-msg { color: var(--f-text-dim); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* --- TAB BAR --- */
-        .tab-bar {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(0,0,0,0.9); border-top: 1px solid var(--f-border);
-            display: flex; justify-content: space-around;
-            padding: 10px 0 calc(10px + var(--safe-bottom));
-        }
-        .tab-item { color: var(--f-text-dim); text-align: center; font-size: 10px; font-weight: 700; }
-        .tab-item.active { color: var(--f-accent); }
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }
+        #messages { list-style-type: none; width: 100%; max-width: 400px; padding: 0; }
+        #messages li { padding: 8px; border-bottom: 1px solid #eee; }
+        #form { display: flex; width: 100%; max-width: 400px; }
     </style>
 </head>
 <body>
+    <h1>Bienvenue sur Floy</h1>
+    <ul id="messages"></ul>
+    <form id="form" action="">
+        <input id="input" autocomplete="off" placeholder="Discutez ici..." /><button>Envoyer</button>
+    </form>
 
-    <div id="floy-engine-loader">
-        <div class="loader-ring"></div>
-        <h2 style="margin-top:20px; color:var(--f-accent); letter-spacing:5px;">FLOY</h2>
-    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        var form = document.getElementById('form');
+        var input = document.getElementById('input');
 
-    <header>
-        <img id="my-profile-pic" class="user-pic" src="https://via.placeholder.com/150" onclick="window.location.href='profile-edit.html'">
-        <div class="logo">FLOY</div>
-        <div id="theme-toggle"><i class="fa-solid fa-moon" style="color:var(--f-accent); font-size:20px;"></i></div>
-    </header>
-
-    <main style="padding-bottom: 100px;">
-        <div class="stories-wrapper">
-            <div class="stories-scroll" id="stories-render">
-                <div class="story-node" onclick="window.location.href='profile-edit.html'">
-                    <div class="avatar-ring" style="border-style:dashed; border-color:#333;">
-                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#444;">
-                            <i class="fa-solid fa-plus"></i>
-                        </div>
-                    </div>
-                    <span style="font-size:11px; margin-top:8px; color:#555;">Ma note</span>
-                </div>
-            </div>
-        </div>
-
-        <div id="chat-list-render">
-            </div>
-    </main>
-
-    <nav class="tab-bar">
-        <div class="tab-item active"><i class="fa-solid fa-house fa-lg"></i><br>HOME</div>
-        <div class="tab-item" onclick="window.location.href='search.html'"><i class="fa-solid fa-magnifying-glass fa-lg"></i><br>EXPLORE</div>
-        <div class="tab-item" onclick="window.location.href='menu.html'"><i class="fa-solid fa-bars fa-lg"></i><br>MENU</div>
-    </nav>
-
-    <script type="module">
-        import { db, auth } from './firebase-config.js';
-        import { collection, query, onSnapshot, orderBy, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        
-        import { ThemeManager } from './theme-manager.js';
-        import { NoteManager } from './note-manager.js';
-        import { StoryViewer } from './story-viewer.js';
-
-        const loader = document.getElementById('floy-engine-loader');
-        const storyRender = document.getElementById('stories-render');
-        const chatRender = document.getElementById('chat-list-render');
-
-        auth.onAuthStateChanged(async (user) => {
-            if (!user) { window.location.href = "auth.html"; return; }
-
-            ThemeManager.init();
-
-            // Sync profil perso
-            onSnapshot(doc(db, "Utilisateurs", user.uid), (snap) => {
-                if (snap.exists()) {
-                    const data = snap.data();
-                    document.getElementById('my-profile-pic').src = data.avatarUrl || 'https://via.placeholder.com/150';
-                    
-                    // Nettoyage note perso si expirée (>24h)
-                    if (data.noteTimestamp && !NoteManager.isNoteValid(data.noteTimestamp)) {
-                        updateDoc(doc(db, "Utilisateurs", user.uid), { statusNote: "", noteTimestamp: null });
-                    }
-                }
-            });
-
-            // Charger les autres utilisateurs
-            const q = query(collection(db, "Utilisateurs"), orderBy("isOnline", "desc"));
-            onSnapshot(q, (snapshot) => {
-                chatRender.innerHTML = "";
-                // On réinitialise sauf le premier (Ma Note)
-                const myNoteNode = storyRender.firstElementChild;
-                storyRender.innerHTML = "";
-                storyRender.appendChild(myNoteNode);
-
-                snapshot.forEach(docSnap => {
-                    const u = docSnap.data();
-                    const id = docSnap.id;
-                    if (id !== user.uid) {
-                        renderUser(u, id);
-                    }
-                });
-                
-                hideLoader();
-            });
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (input.value) {
+                socket.emit('chat message', input.value);
+                input.value = '';
+            }
         });
 
-        function renderUser(u, id) {
-            // Rendu Story (si en ligne)
-            if (u.isOnline) {
-                const node = document.createElement('div');
-                node.className = 'story-node';
-                node.onclick = () => StoryViewer.show(u);
-                
-                const noteHTML = NoteManager.getNoteHTML(u);
-
-                node.innerHTML = `
-                    ${noteHTML}
-                    <div class="avatar-ring"><img src="${u.avatarUrl || 'https://via.placeholder.com/150'}"></div>
-                    <div class="online-dot"></div>
-                    <span style="font-size:11px; margin-top:8px;">${u.username}</span>
-                `;
-                storyRender.appendChild(node);
-            }
-
-            // Rendu Chat Card
-            const card = document.createElement('div');
-            card.className = 'chat-card';
-            card.onclick = () => window.location.href = `chat.html?id=${id}`;
-            card.innerHTML = `
-                <img src="${u.avatarUrl || 'https://via.placeholder.com/150'}" style="width:55px; height:55px; border-radius:50%; object-fit:cover;">
-                <div class="chat-info">
-                    <div class="chat-name">${u.username}</div>
-                    <div class="chat-msg">Cliquer pour discuter...</div>
-                </div>
-            `;
-            chatRender.appendChild(card);
-        }
-
-        function hideLoader() {
-            loader.style.opacity = "0";
-            setTimeout(() => { loader.style.display = "none"; }, 600);
-        }
-
-        // Sécurité : Fermer le loader de force après 5s
-        setTimeout(hideLoader, 5000);
-
-        document.getElementById('theme-toggle').onclick = () => ThemeManager.toggle();
+        socket.on('chat message', function(msg) {
+            var item = document.createElement('li');
+            item.textContent = msg;
+            document.getElementById('messages').appendChild(item);
+        });
     </script>
 </body>
 </html>
