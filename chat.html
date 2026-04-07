@@ -2,201 +2,23 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Floy | Discussion</title>
+    <title>Floy | Chat</title>
+    <link rel="stylesheet" href="style.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <style>
-        :root {
-            --orange: #FF7920;
-            --black: #000000;
-            --dark-gray: #121212;
-            --light-gray: #1E1E1E;
-            --text-white: #FFFFFF;
-        }
-
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            background-color: var(--black);
-            color: var(--text-white);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-        }
-
-        /* Container Principal */
-        .app-container {
-            display: flex;
-            height: 100vh;
-        }
-
-        /* Barre Latérale (Menu) */
-        .sidebar {
-            width: 80px;
-            background-color: var(--black);
-            border-right: 1px solid var(--light-gray);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 25px;
-            gap: 30px;
-        }
-
-        .sidebar .logo-f {
-            color: var(--orange);
-            font-size: 32px;
-            font-weight: 900;
-            margin-bottom: 20px;
-        }
-
-        .sidebar i {
-            font-size: 26px;
-            color: #555;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .sidebar i.active, .sidebar i:hover {
-            color: var(--orange);
-        }
-
-        /* Fenêtre de Chat */
-        .chat-main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--light-gray);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .chat-header h2 {
-            font-size: 18px;
-            margin: 0;
-            color: var(--orange);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Zone des messages */
-        #messages-container {
-            flex: 1;
-            padding: 25px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            background-image: radial-gradient(circle at 50% 50%, #0a0a0a 0%, #000000 100%);
-        }
-
-        /* Bulles de message */
-        .message {
-            max-width: 70%;
-            padding: 12px 18px;
-            border-radius: 18px;
-            font-size: 15px;
-            line-height: 1.4;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .sent {
-            align-self: flex-end;
-            background-color: var(--orange);
-            color: var(--black);
-            font-weight: 600;
-            border-bottom-right-radius: 2px;
-        }
-
-        .received {
-            align-self: flex-start;
-            background-color: var(--light-gray);
-            color: var(--text-white);
-            border-bottom-left-radius: 2px;
-        }
-
-        /* Zone de saisie */
-        .input-area {
-            padding: 20px;
-            background-color: var(--black);
-            border-top: 1px solid var(--light-gray);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .input-area input {
-            flex: 1;
-            background-color: var(--dark-gray);
-            border: 1px solid var(--light-gray);
-            padding: 15px 20px;
-            border-radius: 30px;
-            color: white;
-            outline: none;
-            font-size: 15px;
-        }
-
-        .input-area input:focus {
-            border-color: var(--orange);
-        }
-
-        .send-btn {
-            background-color: var(--orange);
-            color: var(--black);
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .send-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 15px rgba(255, 121, 32, 0.4);
-        }
-
-        .send-btn i {
-            font-size: 24px;
-        }
-
-    </style>
 </head>
 <body>
 
     <div class="app-container">
         <aside class="sidebar">
             <div class="logo-f">F</div>
-            <i class='bx bxs-chat active'></i>
-            <i class='bx bxs-group'></i>
-            <i class='bx bxs-bell'></i>
-            <i class='bx bxs-cog' style="margin-top: auto; margin-bottom: 25px;"></i>
+            <i class='bx bxs-chat' style="color: var(--floy-orange); font-size: 24px;"></i>
         </aside>
 
         <main class="chat-main">
-            <header class="chat-header">
-                <h2>Salon Principal</h2>
-                <div style="font-size: 12px; color: #2ecc71;">● En ligne</div>
-            </header>
-
-            <div id="messages-container">
-                <div class="message received">Bienvenue sur Floy ! Écris ton premier message.</div>
-            </div>
+            <div id="messages-container"></div>
 
             <div class="input-area">
-                <input type="text" id="chat-input" placeholder="Écris quelque chose..." autocomplete="off">
+                <input type="text" id="chat-input" placeholder="Message..." autocomplete="off">
                 <button class="send-btn" id="send-trigger">
                     <i class='bx bxs-send'></i>
                 </button>
@@ -204,35 +26,6 @@
         </main>
     </div>
 
-    <script>
-        const input = document.getElementById('chat-input');
-        const trigger = document.getElementById('send-trigger');
-        const container = document.getElementById('messages-container');
-
-        function sendMessage() {
-            const text = input.value.trim();
-            if (text !== "") {
-                const msgDiv = document.createElement('div');
-                msgDiv.classList.add('message', 'sent');
-                msgDiv.innerText = text;
-                container.appendChild(msgDiv);
-                
-                input.value = "";
-                container.scrollTop = container.scrollHeight;
-                
-                // Simulation d'une réponse auto pour tester le style "reçu"
-                setTimeout(() => {
-                    const reply = document.createElement('div');
-                    reply.classList.add('message', 'received');
-                    reply.innerText = "Bien reçu sur Floy ! 🔥";
-                    container.appendChild(reply);
-                    container.scrollTop = container.scrollHeight;
-                }, 1000);
-            }
-        }
-
-        trigger.onclick = sendMessage;
-        input.onkeypress = (e) => { if(e.key === 'Enter') sendMessage(); };
-    </script>
+    <script type="module" src="message-engine.js"></script>
 </body>
 </html>
