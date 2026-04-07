@@ -2,39 +2,46 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Floy | Chat</title>
     <link rel="stylesheet" href="style.css">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        body { background: #000; color: #fff; margin: 0; font-family: sans-serif; }
+        .chat-window { display: flex; flex-direction: column; height: 100vh; }
+        #messages-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .input-area { padding: 20px; display: flex; gap: 10px; background: #121212; }
+        input { flex: 1; padding: 15px; border-radius: 10px; border: none; background: #1e1e1e; color: white; outline: none; }
+        button { background: #FF7920; border: none; padding: 0 20px; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .msg-sent { align-self: flex-end; background: #FF7920; color: #000; padding: 10px 15px; border-radius: 15px 15px 0 15px; max-width: 70%; font-weight: 600; }
+    </style>
 </head>
-<body style="background-color: #000000; color: white;">
-
-    <div class="chat-container" style="display: flex; height: 100vh;">
-        <aside style="width: 80px; border-right: 1px solid #1E1E1E; display: flex; flex-direction: column; align-items: center; padding-top: 20px;">
-            <div style="color: #FF7920; font-weight: 900; font-size: 24px; margin-bottom: 40px;">F</div>
-            <i class='bx bxs-message-rounded-dots' style="color: #FF7920; font-size: 28px; margin-bottom: 30px;"></i>
-            <i class='bx bx-user' style="color: #A0A0A0; font-size: 28px;"></i>
-        </aside>
-
-        <main style="flex: 1; display: flex; flex-direction: column;">
-            <header style="padding: 20px; border-bottom: 1px solid #1E1E1E;">
-                <h2 style="font-size: 18px;">Discussion Floy</h2>
-            </header>
-
-            <div id="chat-messages" style="flex: 1; padding: 20px; overflow-y: auto;">
-                <p style="color: #A0A0A0; text-align: center;">Bienvenue sur le chat Floy !</p>
+<body>
+    <div class="chat-window">
+        <header style="padding: 20px; border-bottom: 1px solid #1e1e1e; color: #FF7920; font-weight: 900;">FLOY CHAT</header>
+        
+        <div id="messages-container">
             </div>
 
-            <footer style="padding: 20px; background: #121212; display: flex; gap: 15px;">
-                <input type="text" id="msg-input" placeholder="Écrire un message..." 
-                       style="flex: 1; background: #1E1E1E; border: none; padding: 15px; border-radius: 12px; color: white; outline: none;">
-                <button id="send-btn" style="background: #FF7920; border: none; width: 50px; border-radius: 12px; cursor: pointer;">
-                    <i class='bx bxs-send' style="font-size: 20px; color: black;"></i>
-                </button>
-            </footer>
-        </main>
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Écris ton message ici...">
+            <button id="send-btn">ENVOYER</button>
+        </div>
     </div>
 
-    <script type="module" src="message-engine.js"></script>
+    <script type="module">
+        const btn = document.getElementById('send-btn');
+        const input = document.getElementById('user-input');
+        const container = document.getElementById('messages-container');
+
+        btn.onclick = () => {
+            if (input.value.trim() !== "") {
+                const div = document.createElement('div');
+                div.className = 'msg-sent';
+                div.innerText = input.value;
+                container.appendChild(div);
+                input.value = "";
+                container.scrollTop = container.scrollHeight;
+            }
+        };
+    </script>
 </body>
 </html>
