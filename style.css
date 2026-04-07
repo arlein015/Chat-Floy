@@ -1,57 +1,36 @@
-/* style.css */
-:root {
-    --orange: #FF7920;
-    --black: #000000;
-    --dark-bg: #121212;
-    --grey-border: #1E1E1E;
+body {
+    background-color: #000000 !important;
+    color: #FF7920 !important;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
 }
 
-body, html {
-    margin: 0; padding: 0; height: 100vh;
-    background-color: var(--black);
-    color: white; font-family: sans-serif;
-    overflow: hidden;
+.chat-box {
+    border: 2px solid #FF7920;
+    padding: 30px;
+    border-radius: 15px;
+    background: #121212;
 }
 
-.app-container { display: flex; height: 100%; }
-
-/* Barre latérale */
-.sidebar {
-    width: 70px; background: var(--black);
-    border-right: 1px solid var(--grey-border);
-    display: flex; flex-direction: column; align-items: center; padding-top: 20px;
+input {
+    background: #1e1e1e;
+    border: 1px solid #FF7920;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
 }
 
-.logo-f { color: var(--orange); font-size: 28px; font-weight: 900; margin-bottom: 30px; }
-
-.sidebar i { color: #555; font-size: 24px; margin-bottom: 25px; cursor: pointer; }
-.sidebar i.active { color: var(--orange); }
-
-/* Fenêtre de chat */
-.chat-main { flex: 1; display: flex; flex-direction: column; }
-
-.chat-header { padding: 15px 20px; border-bottom: 1px solid var(--grey-border); }
-.chat-header h2 { font-size: 16px; color: var(--orange); margin: 0; }
-
-#messages-container {
-    flex: 1; padding: 20px; overflow-y: auto;
-    display: flex; flex-direction: column; gap: 10px;
-}
-
-/* Bulles de message */
-.message { padding: 10px 15px; border-radius: 12px; max-width: 75%; font-weight: 500; }
-.sent { align-self: flex-end; background: var(--orange); color: black; }
-.received { align-self: flex-start; background: var(--grey-border); color: white; }
-
-/* Zone d'envoi */
-.input-area { padding: 15px; display: flex; gap: 10px; background: var(--black); border-top: 1px solid var(--grey-border); }
-
-input { 
-    flex: 1; background: var(--dark-bg); border: 1px solid var(--grey-border);
-    padding: 12px 20px; border-radius: 25px; color: white; outline: none;
-}
-
-.send-btn { 
-    background: var(--orange); border: none; width: 45px; height: 45px;
-    border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
+button {
+    background: #FF7920;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
 }
