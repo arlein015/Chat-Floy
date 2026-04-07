@@ -2,37 +2,35 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Floy | Chat</title>
-    <link rel="stylesheet" href="style.css">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <title>TEST FLOY ORANGE</title>
+    <style>
+        /* SI TU VOIS DU NOIR ET DU ORANGE, CA MARCHE */
+        body { 
+            background-color: #000000 !important; 
+            color: #FF7920 !important; 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .box {
+            border: 2px solid #FF7920;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+        }
+        h1 { font-size: 50px; text-transform: uppercase; letter-spacing: 5px; }
+        p { color: white; }
+    </style>
 </head>
 <body>
-
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="logo-f">F</div>
-            <i class='bx bxs-chat active'></i>
-            <i class='bx bxs-user-circle'></i>
-        </aside>
-
-        <main class="chat-main">
-            <header class="chat-header">
-                <h2>Salon FLOY</h2>
-            </header>
-
-            <div id="messages-container">
-                </div>
-
-            <div class="input-area">
-                <input type="text" id="chat-input" placeholder="Écris ici..." autocomplete="off">
-                <button class="send-btn" id="send-trigger">
-                    <i class='bx bxs-send'></i>
-                </button>
-            </div>
-        </main>
+    <div class="box">
+        <h1>FLOY</h1>
+        <p>Si tu vois ce message en ORANGE sur fond NOIR,</p>
+        <p>alors nous avons enfin le contrôle !</p>
     </div>
-
-    <script src="message-engine.js"></script>
 </body>
 </html>
