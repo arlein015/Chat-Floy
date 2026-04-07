@@ -1,38 +1,31 @@
-// index.js - Le point d'entrée de Floy
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
+/**
+ * index.js - Point d'entrée de FLOY
+ * Mode : Développement (Bypass Auth)
+ */
 
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("%c FLOY ", "color: #FF7920; font-weight: bold; font-size: 20px;", "Démarrage du système...");
 
-const PORT = process.env.PORT || 3000;
+    // On récupère le conteneur du loader si tu en as un (facultatif)
+    const loader = document.getElementById('loader');
 
-// On sert les fichiers statiques (ton futur design)
-app.use(express.static('public'));
-
-// --- LOGIQUE DU CHAT FLOY ---
-io.on('connection', (socket) => {
-    console.log('Un utilisateur s’est connecté à Floy 🟢');
-
-    // Écouter quand un utilisateur envoie un message
-    socket.on('chat message', (msg) => {
-        console.log('Message reçu : ' + msg);
-        // On renvoie le message à tout le monde en temps réel
-        io.emit('chat message', msg);
-    });
-
-    socket.on('disconnect', () => {
-        console.log('Un utilisateur a quitté le chat 🔴');
-    });
-});
-
-window.addEventListener('load', () => {
-    console.log("🚀 Mode Développeur : Accès direct au Chat Floy...");
-    
-    // On simule un petit chargement pour le style
+    // On simule une petite attente pour vérifier que tout est chargé
     setTimeout(() => {
-        window.location.href = "chat.html"; 
-    }, 1000); 
+        if (loader) {
+            loader.style.opacity = '0';
+            loader.style.transition = '0.5s';
+        }
+
+        console.log("🚀 Redirection vers le module CHAT...");
+        
+        // C'est ici que la magie opère : on saute le login
+        window.location.href = "chat.html";
+        
+    }, 1500); // 1.5 seconde de délai pour le style
 });
+
+/**
+ * Note pour plus tard (Luther) :
+ * Quand on aura fini le design du chat, on reviendra ici
+ * pour remettre la vérification Firebase (onAuthStateChanged).
+ */
