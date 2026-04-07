@@ -1,36 +1,49 @@
-import { db } from './firebase-config.js';
-import { 
-    collection, addDoc, query, orderBy, onSnapshot, 
-    serverTimestamp, updateDoc, doc 
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+// message-engine.js
+document.addEventListener('DOMContentLoaded', () => {
+    const sendBtn = document.getElementById('send-btn');
+    const msgInput = document.getElementById('msg-input');
+    const chatMessages = document.getElementById('chat-messages');
 
-export const MessageEngine = {
-    getRoomId(uid1, uid2) {
-        return [uid1, uid2].sort().join("_");
-    },
+    // Fonction pour ajouter une bulle de message
+    const appendMessage = (text, type) => {
+        const msgDiv = document.createElement('div');
+        msgDiv.style.marginBottom = "15px";
+        msgDiv.style.display = "flex";
+        msgDiv.style.justifyContent = type === 'sent' ? "flex-end" : "flex-start";
 
-    sendMessage(senderId, receiverId, text) {
-        const roomId = this.getRoomId(senderId, receiverId);
-        return addDoc(collection(db, "chats", roomId, "messages"), {
-            senderId,
-            text,
-            timestamp: serverTimestamp(),
-            read: false
-        });
-    },
+        const bubble = document.createElement('div');
+        bubble.innerText = text;
+        bubble.style.padding = "12px 18px";
+        bubble.style.borderRadius = "15px";
+        bubble.style.maxWidth = "70%";
+        
+        // Design Orange pour les messages envoyés
+        if(type === 'sent') {
+            bubble.style.backgroundColor = "#FF7920";
+            bubble.style.color = "#000000";
+            bubble.style.fontWeight = "bold";
+        } else {
+            bubble.style.backgroundColor = "#1E1E1E";
+            bubble.style.color = "#FFFFFF";
+        }
 
-    listenMessages(uid1, uid2, callback) {
-        const roomId = this.getRoomId(uid1, uid2);
-        const q = query(collection(db, "chats", roomId, "messages"), orderBy("timestamp", "asc"));
-        return onSnapshot(q, (snapshot) => {
-            const messages = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-            callback(messages);
-        });
-    },
+        msgDiv.appendChild(bubble);
+        chatMessages.appendChild(msgDiv);
+        
+        // Scroll automatique vers le bas
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    };
 
-    async markAsRead(uid1, uid2, messageId) {
-        const roomId = this.getRoomId(uid1, uid2);
-        const msgRef = doc(db, "chats", roomId, "messages", messageId);
-        await updateDoc(msgRef, { read: true });
-    }
-};
+    // Action au clic sur Envoyer
+    sendBtn.addEventListener('click', () => {
+        if(msgInput.value.trim() !== "") {
+            appendMessage(msgInput.value, 'sent');
+            msgInput.value = ""; // On vide le champ
+        }
+    });
+
+    // Envoyer avec la touche Entrée
+    msgInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendBtn.click();
+    });
+});
