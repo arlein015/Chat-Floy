@@ -160,7 +160,15 @@
         </div>
     </div>
 
-    <script type="module" src="auth-controller.js"></script>
+    <script type="module" src="auth-controller.js">
+    // Ce test va nous dire si ta clé est "lisible" par le navigateur
+    window.addEventListener('error', function(e) {
+        if (e.message.includes('apiKey')) {
+            alert("Alerte Floy : Ta clé API contient un caractère invisible ou n'est pas reconnue !");
+        }
+    });
+        
+    </script>
 
 </body>
 </html>
