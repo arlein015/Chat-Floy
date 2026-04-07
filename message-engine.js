@@ -1,23 +1,10 @@
-// message-engine.js
-const input = document.getElementById('chat-input');
-const btn = document.getElementById('send-trigger');
-const container = document.getElementById('messages-container');
+const btn = document.getElementById('btn');
+const input = document.getElementById('msg');
+const display = document.getElementById('display');
 
-function postMessage() {
-    const text = input.value.trim();
-    if (text !== "") {
-        const div = document.createElement('div');
-        div.classList.add('message', 'sent');
-        div.innerText = text;
-        container.appendChild(div);
-        
+btn.onclick = function() {
+    if(input.value !== "") {
+        display.innerHTML = "Tu as dit : " + input.value;
         input.value = "";
-        container.scrollTop = container.scrollHeight;
     }
-}
-
-btn.onclick = postMessage;
-
-input.onkeypress = (e) => {
-    if (e.key === 'Enter') postMessage();
 };
