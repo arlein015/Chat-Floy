@@ -1,36 +1,70 @@
-body {
-    background-color: #000000 !important;
-    color: #FF7920 !important;
-    font-family: sans-serif;
+/* style.css */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #000000; /* NOIR */
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 70px;
+    background-color: #000;
+    border-right: 1px solid #1E1E1E;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 100vh;
-    margin: 0;
+    padding-top: 20px;
 }
 
-.chat-box {
-    border: 2px solid #FF7920;
-    padding: 30px;
-    border-radius: 15px;
-    background: #121212;
+.logo { color: #FF7920; font-size: 30px; font-weight: 900; margin-bottom: 40px; }
+.icon { font-size: 24px; margin-bottom: 30px; cursor: pointer; filter: grayscale(1); }
+.icon.active { filter: grayscale(0); }
+
+/* Chat */
+.chat-area { flex: 1; display: flex; flex-direction: column; }
+.chat-header { padding: 20px; border-bottom: 1px solid #1E1E1E; }
+.chat-header h2 { color: #FF7920; margin: 0; font-size: 18px; }
+
+#messages-container { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+
+.msg { padding: 12px; border-radius: 12px; max-width: 70%; }
+.received { background: #1E1E1E; align-self: flex-start; }
+
+/* Input Bar */
+.input-bar {
+    padding: 20px;
+    display: flex;
+    gap: 10px;
+    background: #000;
+    border-top: 1px solid #1E1E1E;
 }
 
 input {
-    background: #1e1e1e;
-    border: 1px solid #FF7920;
+    flex: 1;
+    background: #121212;
+    border: 1px solid #1E1E1E;
     color: white;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 12px;
+    border-radius: 8px;
+    outline: none;
 }
 
+input:focus { border-color: #FF7920; }
+
 button {
-    background: #FF7920;
+    background: #FF7920; /* ORANGE */
     color: black;
     border: none;
-    padding: 10px 20px;
+    padding: 0 20px;
+    border-radius: 8px;
     font-weight: bold;
     cursor: pointer;
-    border-radius: 5px;
 }
