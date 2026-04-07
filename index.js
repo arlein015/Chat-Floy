@@ -28,7 +28,11 @@ io.on('connection', (socket) => {
     });
 });
 
-// Lancement du serveur
-server.listen(PORT, () => {
-    console.log(`🚀 Floy est lancé sur http://localhost:${PORT}`);
+window.addEventListener('load', () => {
+    console.log("🚀 Mode Développeur : Accès direct au Chat Floy...");
+    
+    // On simule un petit chargement pour le style
+    setTimeout(() => {
+        window.location.href = "chat.html"; 
+    }, 1000); 
 });
